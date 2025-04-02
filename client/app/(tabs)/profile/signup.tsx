@@ -7,26 +7,29 @@ import COLORS from '../../constants/colors';
 import { useState } from 'react';
 
 type FormData = {
-    name: string;
-    surname: string;
-    password: string;
-    passwordAgain: string;
-    email: string;
-    agreedConditions: boolean;
+  fullName: string;
+  username: string;
+  email: string;
+  password: string;
+  passwordAgain: string;
+  agreedConditions: boolean;
 };
 const Signup = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const { control, handleSubmit, formState: { errors }, watch } = useForm<FormData>({
     defaultValues: {
-      name: '',
-      surname: '',
+      fullName: '',
+      username: '',
+      email: '',
       password: '',
       passwordAgain: '',
-      email: '',
       agreedConditions: false
     }
   });
-  const onSubmit = (data: FormData) => console.log(data);
+  const formValues = watch();
+  const onSubmit = (data: FormData) => {
+    console.log(data);
+  }
 
   const textInputClasses = 'font-nunitoBold text-2xl bg-greayish rounded-2xl h-16 px-6';
   return (
@@ -34,12 +37,12 @@ const Signup = () => {
       <NuText variant='extraBold' className='text-5xl text-center pt-4'>SIGN UP</NuText>
       <View className='w-full gap-y-2'>
         <Controller
-          name="name"
+          name="fullName"
           control={control}
-          rules={{ required: true }}
+          rules={{ required: 'Full name is required!' }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              placeholder='Name'
+              placeholder='Full Name'
               className={`${textInputClasses}`}
               onBlur={onBlur}
               onChangeText={onChange}
@@ -47,24 +50,27 @@ const Signup = () => {
             />
           )}
         />
+        {errors.fullName && <Text className='ps-2 -mt-1.5 text-sm text-red-600'>{errors.fullName.message}</Text>}
         <Controller
-          name="surname"
+          name="username"
           control={control}
-          rules={{ required: true }}
+          rules={{ required: 'Username is required!' }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
-              placeholder='Surname'
+              placeholder='Username'
               className={`${textInputClasses}`}
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
+              autoCapitalize='none'
             />
           )}
         />
+        {errors.username && <Text className='ps-2 -mt-1.5 text-sm text-red-600'>{errors.username.message}</Text>}
         <Controller
           name="email"
           control={control}
-          rules={{ required: true }}
+          rules={{ required: 'Email is required!' }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               placeholder='Email'
@@ -72,14 +78,19 @@ const Signup = () => {
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
+              autoCapitalize='none'
             />
           )}
         />
+        {errors.email && <Text className='ps-2 -mt-1.5 text-sm text-red-600'>{errors.email.message}</Text>}
         <View className='relative'>
           <Controller
             name="password"
             control={control}
-            rules={{ required: true }}
+            rules={{
+              required: 'Password is required!',
+              minLength: { value: 6, message: 'At least 6 characters' },
+            }}
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
                 placeholder='Password'
@@ -95,16 +106,19 @@ const Signup = () => {
             className='absolute top-0 right-0 bottom-0 justify-center px-4'
             onPress={() => setIsPasswordVisible(!isPasswordVisible)}
           >
-            {isPasswordVisible ?
-              <FontAwesome name="eye-slash" size={24} color={COLORS.blackish} /> :
-              <FontAwesome name="eye" size={24} color={COLORS.blackish} />
-            }
+            <FontAwesome name={isPasswordVisible ? "eye-slash" : "eye"} size={24} color={COLORS.blackish} />
           </TouchableOpacity>
         </View>
+        {errors.password && <Text className='ps-2 -mt-1.5 text-sm text-red-600'>{errors.password.message}</Text>}
+
         <Controller
           name="passwordAgain"
           control={control}
-          rules={{ required: true }}
+          rules={{
+            required: 'Please confirm your password',
+            validate: value =>
+              value === formValues.password || 'Passwords do not match!',
+          }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               placeholder='Password Again'
@@ -116,30 +130,35 @@ const Signup = () => {
             />
           )}
         />
+        {errors.passwordAgain && <Text className='ps-2 -mt-1.5 text-sm text-red-600'>{errors.passwordAgain.message}</Text>}
+
         <Controller
-            name="agreedConditions"
-            control={control}
-            render={({ field: { onChange, onBlur, value } }) => (
-                <TouchableOpacity 
-                    className='mt-4 flex-row items-center gap-x-4'
-                    onPress={() => onChange(!value)}
-                >
-                    <View className='size-10 rounded-2xl bg-greayish items-center justify-center'>
-                        {value &&  <FontAwesome name="check" size={24} color={COLORS.blackish} />}
-                    </View>
-                    <View className='flex-row gap-x-1'>
-                        <NuText variant='semiBold' className='text-xl'>I agree</NuText>
-                        <TouchableOpacity onPress={() => console.log('terms and conditions')}>
-                            <NuText variant='semiBold' className='text-primary text-xl'>terms & conditions</NuText>
-                        </TouchableOpacity>
-                    </View>
+          name="agreedConditions"
+          control={control}
+          rules={{ required: 'You must accept the terms and conditions!' }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TouchableOpacity
+              className='mt-4 flex-row items-center gap-x-4'
+              onPress={() => onChange(!value)}
+            >
+              <View className='size-10 rounded-2xl bg-greayish items-center justify-center'>
+                {value && <FontAwesome name="check" size={24} color={COLORS.blackish} />}
+              </View>
+              <View className='flex-row gap-x-1'>
+                <NuText variant='semiBold' className='text-xl'>I agree</NuText>
+                <TouchableOpacity onPress={() => console.log('terms and conditions')}>
+                  <NuText variant='semiBold' className='text-primary text-xl'>terms & conditions</NuText>
                 </TouchableOpacity>
-            )}
+              </View>
+            </TouchableOpacity>
+          )}
         />
-        <TouchableOpacity onPress={handleSubmit(onSubmit)}>
-          <View className='bg-primary h-16 justify-center rounded-2xl'>
-            <NuText variant='bold' className='text-center text-white text-2xl'>Submit</NuText>
-          </View>
+        {errors.agreedConditions && <Text className='ps-2 -mt-1.5 text-sm text-red-600'>{errors.agreedConditions.message}</Text>}
+
+        <TouchableOpacity
+          className='mt-2 bg-primary disabled:opacity-60 h-16 justify-center rounded-2xl'
+          onPress={handleSubmit(onSubmit)}>
+          <NuText variant='bold' className='text-center text-white text-2xl'>Submit</NuText>
         </TouchableOpacity>
       </View>
       <View className='flex-row items-center gap-x-2 pl-2'>
