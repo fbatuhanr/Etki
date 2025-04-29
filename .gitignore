@@ -21,9 +21,8 @@
 /client/npm-debug.*
 /client/yarn-debug.*
 /client/yarn-error.*
-## local env files
-/client/.env
-/client/.env*.local
+## env files
+/client/.env*
 ## typescript
 /client/*.tsbuildinfo
 
