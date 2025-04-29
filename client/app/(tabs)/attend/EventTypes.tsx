@@ -1,10 +1,9 @@
-import { View, Text } from 'react-native'
-import React from 'react'
-import { FlatList } from 'react-native-gesture-handler'
-import NuText from '@/app/components/NuText'
-import NuLink from '@/app/components/NuLink'
-import { sampleEventTypes } from '@/app/data/sample'
-import EventType from '@/app/components/EventType'
+import React from 'react';
+import { View } from 'react-native';
+import NuText from '@/src/components/NuText';
+import NuLink from '@/src/components/NuLink';
+import { sampleEventTypes } from '@/src/data/sample';
+import EventType from '@/src/components/EventType';
 
 const EventTypes = () => {
   return (

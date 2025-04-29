@@ -1,10 +1,14 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-import NuText from '../../components/NuText';
-import NuLink from '../../components/NuLink';
-import { Controller, useForm } from 'react-hook-form';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import COLORS from '../../constants/colors';
 import { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { Controller, useForm } from 'react-hook-form';
+import useAuthentication from '@/src/hooks/useAuthentication';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import NuText from '@/src/components/NuText';
+import NuLink from '@/src/components/NuLink';
+import COLORS from '@/src/constants/colors';
+import { Toast } from 'toastify-react-native';
+import { errorMessages } from '@/src/constants/messages';
+import { useRouter } from 'expo-router';
 
 type FormData = {
   fullName: string;
@@ -15,7 +19,13 @@ type FormData = {
   agreedConditions: boolean;
 };
 const Signup = () => {
+
+  const { signupCall } = useAuthentication();
+  const router = useRouter();
+
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isSubmitProcessing, setIsSubmitProcessing] = useState(false);
+
   const { control, handleSubmit, formState: { errors }, watch } = useForm<FormData>({
     defaultValues: {
       fullName: '',
@@ -27,8 +37,22 @@ const Signup = () => {
     }
   });
   const formValues = watch();
-  const onSubmit = (data: FormData) => {
-    console.log(data);
+  const onSubmit = async (data: FormData) => {
+
+    setIsSubmitProcessing(true);
+    Toast.info("Information is being checked...");
+
+    try {
+      const response = await signupCall(data.fullName, data.username, data.email, data.password);
+      Toast.success(response);
+
+      router.replace('/(tabs)/profile/login');
+
+    } catch (error) {
+      Toast.error(errorMessages.default);
+    } finally {
+      setIsSubmitProcessing(false);
+    }
   }
 
   const textInputClasses = 'font-nunitoBold text-2xl bg-greayish rounded-2xl h-16 px-6';
@@ -39,10 +63,14 @@ const Signup = () => {
         <Controller
           name="fullName"
           control={control}
-          rules={{ required: 'Full name is required!' }}
+          rules={{
+            required: 'Full name is required!',
+            validate: value => value.trim().split(' ').length >= 2 || 'Please enter at least first and last name'
+          }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               placeholder='Full Name'
+              placeholderTextColor="#6d7375"
               className={`${textInputClasses}`}
               onBlur={onBlur}
               onChangeText={onChange}
@@ -58,6 +86,7 @@ const Signup = () => {
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               placeholder='Username'
+              placeholderTextColor="#6d7375"
               className={`${textInputClasses}`}
               onBlur={onBlur}
               onChangeText={onChange}
@@ -70,10 +99,17 @@ const Signup = () => {
         <Controller
           name="email"
           control={control}
-          rules={{ required: 'Email is required!' }}
+          rules={{
+            required: 'Email is required!',
+            pattern: {
+              value: /\S+@\S+\.\S+/,
+              message: 'Entered value does not match email format',
+            },
+          }}
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               placeholder='Email'
+              placeholderTextColor="#6d7375"
               className={`${textInputClasses}`}
               onBlur={onBlur}
               onChangeText={onChange}
@@ -94,6 +130,7 @@ const Signup = () => {
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
                 placeholder='Password'
+                placeholderTextColor="#6d7375"
                 className='font-nunitoBold text-2xl bg-greayish rounded-2xl h-16 pl-6 pr-14'
                 onBlur={onBlur}
                 onChangeText={onChange}
@@ -122,6 +159,7 @@ const Signup = () => {
           render={({ field: { onChange, onBlur, value } }) => (
             <TextInput
               placeholder='Password Again'
+              placeholderTextColor="#6d7375"
               className={`${textInputClasses}`}
               onBlur={onBlur}
               onChangeText={onChange}
@@ -157,7 +195,8 @@ const Signup = () => {
 
         <TouchableOpacity
           className='mt-2 bg-primary disabled:opacity-60 h-16 justify-center rounded-2xl'
-          onPress={handleSubmit(onSubmit)}>
+          onPress={handleSubmit(onSubmit)}
+          disabled={isSubmitProcessing}>
           <NuText variant='bold' className='text-center text-white text-2xl'>Submit</NuText>
         </TouchableOpacity>
       </View>

@@ -1,17 +1,16 @@
 import axios from "axios";
-// import { useAppStore, useAppDispatch } from "../redux/hooks";
-// import { clearAccessToken, setAccessToken } from "../redux/features/authSlice";
+import { useAppStore, useAppDispatch } from "@/src/hooks/useRedux";
+import { clearAccessToken, setAccessToken } from "@/src/redux/features/authSlice";
 
 const useAxios = () => {
-  // const store = useAppStore();
-  // const dispatch = useAppDispatch();
+  const store = useAppStore();
+  const dispatch = useAppDispatch();
 
   const axiosInstance = axios.create({
-    baseURL: process.env.API_URL,
+    baseURL: process.env.EXPO_PUBLIC_API_URL,
     withCredentials: true, // Required to send cookies
   });
 
-  /*
   axiosInstance.interceptors.request.use(
     (config) => {
       const state = store.getState();
@@ -53,7 +52,6 @@ const useAxios = () => {
       return Promise.reject(error);
     }
   );
-  */
 
   return axiosInstance;
 };

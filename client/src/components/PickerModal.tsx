@@ -34,7 +34,7 @@ const PickerModal: React.FC<PickerModalProps> = ({
                 <View className="flex-1 justify-center bg-black/50">
                     <TouchableWithoutFeedback>
                         <View className="bg-white m-5 p-5 rounded-lg items-center">
-                            <NuText variant='bold' className="text-2xl font-bold mb-4">{title}</NuText>
+                            <NuText variant='bold' className="text-2xl text-center font-bold mb-4">{title}</NuText>
 
                             <Picker
                                 selectedValue={selectedValue}

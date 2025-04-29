@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const ProfileLayout = () => {
     return (
-        <SafeAreaView>
+        <SafeAreaView edges={['top']}>
             <Slot />
         </SafeAreaView>
     )

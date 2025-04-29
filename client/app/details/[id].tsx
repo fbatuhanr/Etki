@@ -3,11 +3,11 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Sharing from 'expo-sharing';
-import { BackIcon, DateDetailBackground, FavIcon, LineIcon, LocationDetailIcon, ParticipantsIcon, ShareIcon, TimerIcon, WarningIcon } from '../components/Vectors';
-import NuText from '../components/NuText';
+import { BackIcon, DateDetailBackground, FavIcon, LineIcon, LocationDetailIcon, ParticipantsIcon, ShareIcon, TimerIcon, WarningIcon } from '@/src/components/Vectors';
+import NuText from '@/src/components/NuText';
 import { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { sampleEvents, sampleEventTypes } from '../data/sample';
+import { sampleEvents, sampleEventTypes } from '@/src/data/sample';
 import { ScrollView } from 'react-native-gesture-handler';
 
 const EventDetail = () => {

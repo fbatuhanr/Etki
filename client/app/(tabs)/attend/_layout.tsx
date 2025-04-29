@@ -4,14 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Link, router, Slot } from 'expo-router';
 
-import NuText from '../../components/NuText';
-import { LogoMultipleRing, SearchIcon, CalendarIcon, BackIcon } from '../../components/Vectors';
+import NuText from '@/src/components/NuText';
+import { LogoMultipleRing, SearchIcon, CalendarIcon, BackIcon } from '@/src/components/Vectors';
 
 // import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
 
-import { COLORS } from '../../constants/colors';
-import { sampleEvents, sampleEventTypes } from '../../data/sample';
-import CalendarModal from '../../components/CalendarModal';
+import { COLORS } from '@/src/constants/colors';
+import CalendarModal from '@/src/components/CalendarModal';
 
 const AttendLayout = () => {
 

@@ -1,10 +1,8 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
-import { Image, StyleSheet, Text, View } from 'react-native';
-import { COLORS } from '../constants/colors';
-import { FONTS } from '../constants/fonts';
-import { ActiveTab, CreateIcon, ProfileIcon, UpArrowIcon } from '../components/Vectors';
-import NuText from '../components/NuText';
+import { StyleSheet, View } from 'react-native';
+import { COLORS } from '@/src/constants/colors';
+import { ActiveTab, CreateIcon, ProfileIcon, UpArrowIcon } from '@/src/components/Vectors';
+import NuText from '@/src/components/NuText';
 
 const TabLayout = () => {
     return (

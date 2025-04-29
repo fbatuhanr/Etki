@@ -24,6 +24,24 @@ export const isTomorrow = (selectedDate?: Date): boolean => {
         selectedDate.getDate() === tomorrow.getDate()
     );
 };
+export const getDaysAgo = (selectedDate?: Date, days: number = 0): Date => {
+    if (!selectedDate) return new Date();
+    const daysAgo = new Date(selectedDate);
+    daysAgo.setDate(selectedDate.getDate() - days);
+    return daysAgo;
+};
+export const getYesterday = (selectedDate?: Date): Date => {
+    if (!selectedDate) return new Date();
+    const yesterday = new Date(selectedDate);
+    yesterday.setDate(selectedDate.getDate() - 1);
+    return yesterday;
+};
+export const getTomorrow = (selectedDate?: Date): Date => {
+    if (!selectedDate) return new Date();
+    const tomorrow = new Date(selectedDate);
+    tomorrow.setDate(selectedDate.getDate() + 1);
+    return tomorrow;
+};
 export const getDayName = (date?: Date, locale: string = 'en-US'): string => {
     if (!date) return '';
     return new Intl.DateTimeFormat(locale, { weekday: 'long' }).format(date);

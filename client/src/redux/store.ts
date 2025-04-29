@@ -1,22 +1,13 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import {
-  persistStore,
-  persistReducer,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-} from "redux-persist";
-import storage from '@react-native-async-storage/async-storage';
+import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { PersistedStore } from "@/src/types/Redux.types";
 
 import authSlice from "./features/authSlice";
-import { PersistedStore } from "../types/Redux.types";
 
 const persistConfig = {
   key: "persist",
-  storage,
+  storage: AsyncStorage,
 };
 
 const rootReducer = combineReducers({

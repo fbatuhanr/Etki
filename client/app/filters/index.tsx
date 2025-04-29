@@ -4,16 +4,16 @@ import { View, TouchableOpacity } from 'react-native';
 import { FlatList, ScrollView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import { Stack } from 'expo-router';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BackIcon, SearchIcon } from '../components/Vectors';
-import COLORS from '../constants/colors';
-import NuText from '../components/NuText';
-import { sampleEvents, sampleEventTypes } from '../data/sample';
-import PickerModal from '../components/PickerModal';
-import CalendarModal from '../components/CalendarModal';
-import EventCardWide from '../components/EventCardWide';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { BackIcon, SearchIcon } from '@/src/components/Vectors';
+import COLORS from '@/src/constants/colors';
+import NuText from '@/src/components/NuText';
+import { sampleEvents, sampleEventTypes } from '@/src/data/sample';
+import PickerModal from '@/src/components/PickerModal';
+import CalendarModal from '@/src/components/CalendarModal';
+import EventCardWide from '@/src/components/EventCardWide';
 import { LinearGradient } from 'expo-linear-gradient';
-import { clipText } from '../utils/textUtils';
+import { clipText } from '@/src/utils/textUtils';
 
 type FilterOptions = {
     sortBy: {

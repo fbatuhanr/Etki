@@ -3,9 +3,8 @@ import { jwtDecode } from "jwt-decode";
 import { defaultDecodedToken } from "@/src/data/defaultValues";
 
 export interface DecodedTokenProps {
-    UserId: string;
-    Name: string;
-    Mail: string;
+    userId: string;
+    username: string;
     exp?: number;
     iat?: number;
 }

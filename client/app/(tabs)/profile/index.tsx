@@ -1,13 +1,13 @@
-import React from 'react'
-import { View, Text } from 'react-native'
-import NuLink from '@/app/components/NuLink';
+import React from 'react';
+import { UserGuard } from '@/src/guards';
+import MainProfile from '@/src/components/profile/MainProfile';
 
 const Profile = () => {
+
   return (
-    <View className='size-full justify-center items-center gap-y-2'>
-      <NuLink href='/(tabs)/profile/login' variant='bold' className='text-3xl'>LOGIN</NuLink>
-      <NuLink href='/(tabs)/profile/signup' variant='bold' className='text-3xl'>SIGN UP</NuLink>
-    </View>
+    <UserGuard>
+      <MainProfile />
+    </UserGuard>
   )
 }
 

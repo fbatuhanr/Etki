@@ -7,6 +7,12 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import { initializeSocket } from "./socket";
 
+/* Import Routes */
+import { user } from "./features/user";
+import { event } from "./features/event";
+import { auth } from "./features/auth";
+import errorHandler from "./middleware/errorHandler";
+
 /* CONFIGURATIONS */
 dotenv.config();
 mongoose
@@ -16,12 +22,13 @@ mongoose
 
 const app: Express = express();
 const port = process.env.PORT || 3001;
-const corsOptions = {
+/*const corsOptions = {
   origin: process.env.CORS_ORIGIN || "http://localhost:3001",
   credentials: true,
-};
+};*/
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+app.use(cors());
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
@@ -36,3 +43,8 @@ initializeSocket(expressServer);
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
+
+app.use("/user", user);
+app.use("/event", event);
+app.use("/auth", auth);
+app.use(errorHandler);

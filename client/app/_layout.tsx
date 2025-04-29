@@ -1,37 +1,29 @@
 import { useEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Stack } from 'expo-router/stack';
-import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
-import {
-  Nunito_400Regular,
-  Nunito_500Medium,
-  Nunito_500Medium_Italic,
-  Nunito_600SemiBold,
-  Nunito_700Bold,
-  Nunito_800ExtraBold,
-} from '@expo-google-fonts/nunito';
-
-import '../global.css';
+import { Nunito_400Regular, Nunito_500Medium, Nunito_500Medium_Italic, Nunito_600SemiBold, Nunito_700Bold, Nunito_800ExtraBold } from '@expo-google-fonts/nunito';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
+import * as SplashScreen from 'expo-splash-screen';
+import StoreProvider from '@/src/providers/StoreProvider';
+import ToastManager from 'toastify-react-native'
+
+import '../global.css';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BackIcon } from '@/src/components/Vectors';
+import NuText from '@/src/components/NuText';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    Nunito_400Regular,
-    Nunito_500Medium,
-    Nunito_500Medium_Italic,
-    Nunito_600SemiBold,
-    Nunito_700Bold,
-    Nunito_800ExtraBold,
-  });
+
+  const [fontsLoaded] = useFonts({ Nunito_400Regular, Nunito_500Medium, Nunito_500Medium_Italic, Nunito_600SemiBold, Nunito_700Bold, Nunito_800ExtraBold });
 
   useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
-    }
+    if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
   if (!fontsLoaded) {
@@ -42,13 +34,31 @@ export default function RootLayout() {
     );
   }
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <StatusBar style="dark" />
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" options={{ title: 'Page Not Found' }} />
-      </Stack>
-    </GestureHandlerRootView>
+    <StoreProvider>
+      <ToastManager />
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <StatusBar style="dark" />
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="profile/ProfileSettings"
+            options={{
+              headerTransparent: true,
+              header: ({ navigation }) => (
+                <LinearGradient colors={['rgba(0, 0, 0, 0.9)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0)']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
+                  <SafeAreaView className='flex-row ps-6 pe-8 justify-between'>
+                    <TouchableOpacity onPress={() => navigation.goBack()} className='flex-row items-center gap-x-4'>
+                      <BackIcon width={24} height={24} />
+                      <NuText variant='bold' className='text-2xl text-white'>Profile Settings</NuText>
+                    </TouchableOpacity>
+                  </SafeAreaView>
+                </LinearGradient>
+              )
+            }}
+          />
+          <Stack.Screen name="+not-found" options={{ title: 'Page Not Found' }} />
+        </Stack>
+      </GestureHandlerRootView>
+    </StoreProvider>
   );
 }
 

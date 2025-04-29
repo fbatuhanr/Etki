@@ -1,14 +1,17 @@
 import React from 'react';
 import { View } from 'react-native';
-import { FlatList, ScrollView } from 'react-native-gesture-handler';
-import EventCard from '../../components/EventCard';
-import NuText from '../../components/NuText';
-import NuLink from '../../components/NuLink';
-import EventType from '../../components/EventType';
-import { sampleEvents, sampleEventTypes } from '../../data/sample';
+import { FlatList } from 'react-native-gesture-handler';
+import EventCard from '@/src/components/EventCard';
+import NuText from '@/src/components/NuText';
+import NuLink from '@/src/components/NuLink';
+import EventType from '@/src/components/EventType';
+import { sampleEvents, sampleEventTypes } from '@/src/data/sample';
+import { useGet } from '@/src/hooks/common/useGet';
 
 const Attend = () => {
 
+  const { data: eventTypes, loading, error } = useGet<any[]>("/event/event-types");
+  console.log("Event Types", eventTypes);
   return (
     <View>
       <View className='mt-8'>
@@ -17,9 +20,9 @@ const Attend = () => {
           <NuLink href='/(tabs)/attend/EventTypes' variant='regular' className='text-2xl text-grayish'>All</NuLink>
         </View>
         <FlatList
-          data={sampleEventTypes}
+          data={eventTypes}
           renderItem={({ item }) => <EventType {...item} />}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
           horizontal
           showsHorizontalScrollIndicator={false}
         />
