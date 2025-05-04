@@ -10,8 +10,7 @@ import { useGet } from '@/src/hooks/common/useGet';
 
 const Attend = () => {
 
-  const { data: eventTypes, loading, error } = useGet<any[]>("/event/event-types");
-  console.log("Event Types", eventTypes);
+  const { data: eventTypes, loading, error } = useGet<any[]>("/event/types");
   return (
     <View>
       <View className='mt-8'>

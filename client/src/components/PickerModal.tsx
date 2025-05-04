@@ -12,6 +12,7 @@ type PickerModalProps = {
     selectedValue: string;
     onValueChange: (value: string) => void;
     title: string;
+    isDefaultEmpty?: boolean;
 };
 
 const PickerModal: React.FC<PickerModalProps> = ({
@@ -56,7 +57,7 @@ const PickerModal: React.FC<PickerModalProps> = ({
                                     :
                                     <TouchableOpacity
                                         className="bg-primary p-3 rounded-lg items-center mt-5"
-                                        onPress={() => onValueChange(selectedValue ? selectedValue : defaultValue)}
+                                        onPress={() => onValueChange(selectedValue || defaultValue || Object.keys(options)[0])}
                                     >
                                         <NuText variant='bold' className="text-white font-bold text-lg">Select</NuText>
                                     </TouchableOpacity>

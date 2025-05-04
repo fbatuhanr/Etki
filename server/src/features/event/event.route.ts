@@ -5,11 +5,11 @@ import authenticateToken from "../../middleware/authMiddleware";
 const router = Router();
 
 // Event CRUD
-router.post("/events", authenticateToken, createEvent);
-router.get("/events", getAllEvents);
-router.get("/events/:id", getEventById);
+router.post("/", authenticateToken, createEvent);
+router.get("/", getAllEvents);
+router.get(":id", getEventById);
 
 // Event Types
-router.get("/event-types", getEventTypes);
+router.get("/types", getEventTypes);
 
 export default router;

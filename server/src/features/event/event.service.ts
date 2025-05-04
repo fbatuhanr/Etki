@@ -2,18 +2,20 @@ import Event from "./event.model";
 import EventType from "./event_type.model";
 
 export const createEventService = async (data: any) => {
+  console.log(data);
   const {
     title,
     description,
-    typeId,
-    date,
+    type: typeId,
+    quota,
     location,
+    date,
+    isLimitedTime,
     isOnline,
     isPrivate,
     isFree,
     entranceFee,
-    offerExpirationDate,
-    createdBy,
+    cover,
   } = data;
 
   const type = await EventType.findById(typeId);
@@ -25,14 +27,15 @@ export const createEventService = async (data: any) => {
     title,
     description,
     typeId,
-    date,
+    quota,
     location,
+    date,
+    isLimitedTime,
     isOnline,
     isPrivate,
     isFree,
     entranceFee,
-    offerExpirationDate,
-    createdBy,
+    cover,
   });
 
   return event;

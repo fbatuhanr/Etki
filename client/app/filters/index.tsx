@@ -91,7 +91,6 @@ const FiltersLayout = () => {
         const typeName = sampleEventTypes.find(i => i.id === typeFilter?.value)?.title;
         if (typeFilter && typeName) {
             setEvents(sampleEvents.filter(i => i.type === typeName));
-            console.log(`typeName: ${typeName}`);
         }
         else {
             setEvents(sampleEvents);

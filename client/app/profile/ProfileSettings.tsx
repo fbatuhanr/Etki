@@ -34,10 +34,6 @@ const ProfileSettings = () => {
 
     const { getUserById, data, loading, error } = useUser();
 
-    console.log('profile settings data:', data);
-    console.log('profile settings loading:', loading);
-    console.log('profile settings error:', error);
-
     const [onProgress, setOnProgress] = useState(false);
 
     const [oldPhotoUrl, setOldPhotoUrl] = useState<string | null>(null);
@@ -120,7 +116,6 @@ const ProfileSettings = () => {
     };
 
     const onSubmit = async (data: FormData) => {
-        console.log('form data:', data);
 
         Toast.info("Profile is updating...");
         setOnProgress(true);
@@ -154,7 +149,6 @@ const ProfileSettings = () => {
             setOnProgress(false);
         }
     }
-    console.log('loading:', loading)
     return (
         <SafeAreaView edges={['top']} className='flex-1 pt-14'>
             <StatusBar style="light" />

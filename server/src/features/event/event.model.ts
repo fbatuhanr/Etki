@@ -17,14 +17,21 @@ const eventSchema = new Schema(
       ref: "event_types",
       required: true,
     },
-    date: {
-      type: Date,
-      required: true,
+    quota: {
+      type: String
     },
     location: {
       type: String,
       required: true,
       trim: true,
+    },
+    date: {
+      type: Date,
+      required: true,
+    },
+    isLimitedTime: {
+      type: Boolean,
+      default: false,
     },
     isOnline: {
       type: Boolean,
@@ -42,20 +49,13 @@ const eventSchema = new Schema(
       type: String,
       default: "",
     },
-    createdBy: {
-      type: Types.ObjectId,
-      ref: "users",
-      required: true,
-    },
+    photo: { type: String },
     participants: [
       {
         type: Types.ObjectId,
         ref: "users",
       },
-    ],
-    offerExpirationDate: {
-      type: Date,
-    },
+    ]
   },
   { timestamps: true }
 );

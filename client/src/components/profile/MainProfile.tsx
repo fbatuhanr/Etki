@@ -24,10 +24,6 @@ const MainProfile = () => {
   const { getUserById, data, loading, error } = useUser();
   const { logoutCall } = useAuthentication();
 
-  console.log('main profile data:', data);
-  console.log('main profile loading:', loading);
-  console.log('main profile error:', error);
-
   const [isLoading, setIsLoading] = useState(false);
 
   const [showMore, setShowMore] = useState(false);
