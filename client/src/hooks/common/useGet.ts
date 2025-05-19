@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import useAxios from '@/src/hooks/useAxios';
+import useAxios from '@/src/hooks/common/useAxios';
 
 export const useGet = <T>(endpoint: string) => {
 

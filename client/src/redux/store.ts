@@ -1,7 +1,7 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PersistedStore } from "@/src/types/Redux.types";
+import { PersistedStore } from "@/src/types/redux";
 
 import authSlice from "./features/authSlice";
 

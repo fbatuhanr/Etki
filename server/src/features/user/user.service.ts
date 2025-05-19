@@ -2,14 +2,11 @@ import User from "./user.model";
 // import FriendRequest from "../friendRequest/friendRequest.model";
 import bcrypt from "bcryptjs";
 import { generateAccessToken, generateRefreshToken } from "../auth/auth.service";
+import { Types } from "mongoose";
 
-type UserProps = {
-  username: string;
-  password: string;
-  email: string | null;
-};
+type UserProps = { username: string; password: string; email: string | null };
 
-async function login(data: UserProps) {
+export async function login(data: UserProps) {
   const { username, password } = data;
 
   const user = await User.findOne({ username });
@@ -26,10 +23,10 @@ async function login(data: UserProps) {
   });
   return { accessToken, refreshToken };
 }
-async function logout() {
+export async function logout() {
   return;
 }
-async function signup(data: UserProps) {
+export async function signup(data: UserProps) {
   const newUser = new User(data);
   newUser.hashPassword = bcrypt.hashSync(data.password, 10);
 
@@ -59,14 +56,30 @@ async function signup(data: UserProps) {
   return savedUser ? true : false;
 }
 
-async function get(id: string) {
+export async function get(id: string) {
   return User.findById(id);
 }
-function update(id: string, data: UserProps) {
+export async function update(id: string, data: UserProps) {
   return User.findOneAndUpdate({ _id: id }, data);
 }
 
-export { 
-  login, logout, signup,
-  get, update
-};
+export async function checkEventIfFavorited(userId: string, eventId: string): Promise<boolean> {
+  const user = await User.findById(userId).select("favorites");
+  if (!user) throw new Error("User not found.");
+  return user.favorites.some((fav) => fav.toString() === eventId);
+}
+export async function addEventFavorite(userId: string, eventId: string) {
+  const user = await User.findById(userId);
+  if (!user) throw new Error("User not found.");
+  const alreadyFavorited = user.favorites.some((id) => id.toString() === eventId);
+  if (alreadyFavorited) throw new Error("Event already favorited.");
+  user.favorites.push(new Types.ObjectId(eventId));
+  await user.save();
+}
+
+export async function removeEventFavorite(userId: string, eventId: string) {
+  const user = await User.findById(userId);
+  if (!user) throw new Error("User not found.");
+  user.favorites = user.favorites.filter((fav) => fav.toString() !== eventId);
+  await user.save();
+}

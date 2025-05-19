@@ -2,19 +2,11 @@ import { Schema, model } from "mongoose";
 
 const eventTypeSchema = new Schema(
   {
-    title: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    cover: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    title: { type: String, required: true, trim: true },
+    cover: { type: String, required: true, trim: true },
   },
+  { timestamps: true }
 );
 
-const EventType = model("event_types", eventTypeSchema);
-
+const EventType = model("EventTypes", eventTypeSchema);
 export default EventType;

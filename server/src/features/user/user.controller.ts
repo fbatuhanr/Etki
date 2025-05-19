@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import * as userService from "./user.service";
-import { LoginResponseProps } from "../../types/User.types";
+import { LoginResponseProps } from "../../types/user";
 import ms, { StringValue } from "ms";
-import { CustomRequest } from "../../middleware/authMiddleware";
+import { CustomRequest } from "../../types/request";
 
-async function login(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function login(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const result: LoginResponseProps | false = await userService.login(req.body);
     if (!result) {
@@ -29,7 +29,7 @@ async function login(req: Request, res: Response, next: NextFunction): Promise<v
     next(error)
   }
 }
-async function logout(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function logout(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     await userService.logout();
     res.clearCookie('refreshToken');
@@ -38,9 +38,8 @@ async function logout(req: Request, res: Response, next: NextFunction): Promise<
     next(error);
   }
 }
-async function signup(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function signup(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    console.log(req.body);
     const isSignedUp = await userService.signup(req.body);
     if (isSignedUp) {
       res.status(201).json({ message: 'Signup successful!' });
@@ -52,7 +51,7 @@ async function signup(req: Request, res: Response, next: NextFunction): Promise<
   }
 }
 
-async function get(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+export async function get(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
   try {
     if (!req.user || req.user.userId !== req.params.id) {
       res.status(403).json({ message: 'Access denied' });
@@ -63,7 +62,7 @@ async function get(req: CustomRequest, res: Response, next: NextFunction): Promi
     next(error)
   }
 }
-async function update(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function update(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const updatedUser = await userService.update(req.params.id, req.body)
     if (!updatedUser) {
@@ -76,7 +75,33 @@ async function update(req: Request, res: Response, next: NextFunction): Promise<
   }
 }
 
-export {
-  login, logout, signup,
-  get, update
-};
+export async function checkEventIfFavorited( req: CustomRequest, res: Response, next: NextFunction) {
+  try {
+    const { userId } = req.user!;
+    const eventId = req.params.eventId;
+    const isFavorited = await userService.checkEventIfFavorited(userId, eventId);
+    res.status(200).json({ isFavorited });
+  } catch (err) {
+    next(err);
+  }
+}
+export async function addEventFavorite(req: CustomRequest, res: Response, next: NextFunction) {
+  try {
+    const { userId } = req.user!;
+    const eventId = req.params.eventId;
+    await userService.addEventFavorite(userId, eventId);
+    res.status(200).json({ message: "Added to favorites" });
+  } catch (err) {
+    next(err);
+  }
+}
+export async function removeEventFavorite(req: CustomRequest, res: Response, next: NextFunction) {
+  try {
+    const userId = req.user!.userId;
+    const eventId = req.params.eventId;
+    await userService.removeEventFavorite(userId, eventId);
+    res.status(200).json({ message: "Removed from favorites" });
+  } catch (err) {
+    next(err);
+  }
+}

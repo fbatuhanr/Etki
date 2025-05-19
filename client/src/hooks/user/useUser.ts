@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useGet } from '../common/useGet';
-import useAxios from '../useAxios';
+import useAxios from '../common/useAxios';
 import { errorMessages } from '@/src/constants/messages';
 
 export const useUser = () => {

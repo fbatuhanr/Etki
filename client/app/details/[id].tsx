@@ -1,39 +1,122 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { Stack, useLocalSearchParams } from 'expo-router';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { View, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Sharing from 'expo-sharing';
 import { BackIcon, DateDetailBackground, FavIcon, LineIcon, LocationDetailIcon, ParticipantsIcon, ShareIcon, TimerIcon, WarningIcon } from '@/src/components/Vectors';
 import NuText from '@/src/components/NuText';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { sampleEvents, sampleEventTypes } from '@/src/data/sample';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useGet } from '@/src/hooks/common/useGet';
+import { formatDate } from '@/src/utils/dateUtils';
+import { Event } from '@/src/types/event';
+import { useDecodedToken } from '@/src/hooks/common/useDecodedToken';
+import { imageBlurHash } from '@/src/constants/images';
+import { Image } from 'expo-image';
+import { useFocusEffect } from '@react-navigation/native';
+import { useEvent } from '@/src/hooks/event/useEvent';
+import useAxios from '@/src/hooks/common/useAxios';
+import { errorMessages, successMessages } from '@/src/constants/messages';
+import { Toast } from 'toastify-react-native';
+import { useUserFavorites } from '@/src/hooks/user/useUserFavorites';
 
 const EventDetail = () => {
     const { id } = useLocalSearchParams();
-    const sampleData = sampleEvents.find(i => i.id === id);
-    const {
-        title,
-        description,
-        cover,
-        type,
-        date,
-        capacity,
-        location,
-        isOnline,
-        isEntryFree,
-        isLimitedAccess,
-        isVipAccess,
-        participants } = sampleData;
+    const decodedToken = useDecodedToken();
+    console.log('id:', id);
+    const axiosInstance = useAxios();
 
+    const [onProgress, setOnProgress] = useState(false);
+
+    const { getEventById } = useEvent();
+    const [event, setEvent] = useState<Event | null>(null);
+    const { title, description, quota, type, location, date, isLimitedTime, isOnline, isPrivate, isFree, cover, participants, creator } = event || {};
+
+    const { checkEventIfFavorited, addEventToFavorites, removeEventFromFavorites } = useUserFavorites();
     const [isFavorited, setIsFavorited] = useState(false);
 
-    const dateParts = sampleData?.date.split(' ') || ['30', 'DECEMBER', '18:00'];
-    const remainingSlots = capacity - participants.length;
+    const dateParts = formatDate(new Date(date ?? "")).split(" ");
+    const remainingSlots = Number(quota) - (participants?.length ?? 0) + 1;
 
-    const handleFavorite = () => {
-        alert('Added to Fav');
+    const quotaWithOwner = Number(quota) + 1;
+
+    const isUserEventOwner = creator?._id === decodedToken?.userId;
+    const isUserParticipant = participants?.some((participant) => participant._id === decodedToken?.userId);
+
+    const editEventLink = `/event/edit-event/${id}` as const;
+
+    useFocusEffect(
+        useCallback(() => {
+            const fetchData = async () => {
+                setEvent(await getEventById(id as string));
+                setIsFavorited(await checkEventIfFavorited(id as string));
+            };
+            fetchData();
+        }, [])
+    );
+
+    const handleAttend = async () => {
+        if (!id) return;
+        if (!decodedToken.userId) {
+            Toast.error("You need to be logged in to attend an event.");
+            router.push('/(tabs)/profile/login');
+            return;
+        }
+        try {
+            setOnProgress(true);
+            Toast.info("Joining event...");
+            const { data: responseData } = await axiosInstance.post(`/event/${id}/attend`);
+            Toast.success(responseData.message || successMessages.attended);
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : errorMessages.attended;
+            Toast.error(message);
+        }
+        finally {
+            setOnProgress(false);
+        }
+    };
+
+    const handleLeave = async () => {
+        if (!id) return;
+        try {
+            setOnProgress(true);
+            Toast.info("Leaving event...");
+            const { data: responseData } = await axiosInstance.post(`/event/${id}/leave`);
+            Toast.success(responseData.message || successMessages.unAttended);
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : errorMessages.unAttended;
+            Toast.error(message);
+        }
+        finally {
+            setOnProgress(false);
+        }
+    };
+
+    const handleFavorite = async () => {
+        if (!id) return;
+        if (!decodedToken.userId) {
+            Toast.error("You need to be logged in to favorite an event.");
+            router.push('/(tabs)/profile/login');
+            return;
+        }
+        try {
+            if (!isFavorited) {
+                const responseData = await addEventToFavorites(id as string);
+                Toast.success(responseData.message || successMessages.favoriteAdded);
+                setIsFavorited(true);
+            } else {
+                const responseData = await removeEventFromFavorites(id as string);
+                Toast.success(responseData.message || successMessages.favoriteRemoved);
+                setIsFavorited(false);
+            }
+        }
+        catch {
+            Toast.error(errorMessages.default);
+        }
+        finally {
+            setOnProgress(false);
+        }
     };
 
     const handleShare = async () => {
@@ -45,6 +128,7 @@ const EventDetail = () => {
             alert('Sharing is not available on this device');
         }
     };
+
 
     return (
         <View className='flex-1 bg-whitish'>
@@ -61,7 +145,7 @@ const EventDetail = () => {
                                         <NuText variant='bold' className='text-2xl text-white'>Event Detail</NuText>
                                     </TouchableOpacity>
                                     <View className='flex-row gap-x-3'>
-                                        <TouchableOpacity onPress={() => setIsFavorited(!isFavorited)}>
+                                        <TouchableOpacity onPress={handleFavorite} disabled={onProgress}>
                                             <FavIcon isFilled={isFavorited} isWhite height={26} width={26} viewBox='0 0 16 14' strokeWidth={1.25} />
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={handleShare}>
@@ -74,20 +158,26 @@ const EventDetail = () => {
                     }}
                 />
                 <View className='h-96 w-full relative overflow-hidden items-center'>
-                    <Image source={sampleData?.cover} className="w-full h-full object-cover" resizeMode="cover" />
+                    <Image
+                        source={cover}
+                        contentFit="cover"
+                        transition={500}
+                        placeholder={{ blurhash: imageBlurHash }}
+                        style={{ width: "100%", height: "100%" }}
+                    />
                     <View className='absolute bottom-0 items-center'>
                         <DateDetailBackground width={316} height={54} />
-                        <View className='absolute bottom-1.5 flex-row items-center'>
-                            <NuText variant='bold' className='text-whitish text-2xl'>{dateParts[0]}</NuText>
-                            <NuText variant='semiBold' className='text-whitish text-xl mx-1'>{dateParts[1]}</NuText>
-                            <NuText variant='bold' className='text-whitish text-xl'>2024</NuText>
-                            <View className='rotate-[-90deg] mt-1.5 -mx-4'><LineIcon width={48} height={8} /></View>
+                        <View className='absolute bottom-1.5 flex-row items-center gap-x-0.5'>
+                            <NuText variant='bold' className='text-whitish text-3xl'>{dateParts[0]}</NuText>
+                            <NuText variant='semiBold' className='text-whitish text-2xl mx-1'>{dateParts[1]}</NuText>
+                            <NuText variant='bold' className='text-whitish text-2xl'>2024</NuText>
+                            <View className='rotate-[-90deg] mt-1.5 -mx-3'><LineIcon width={48} height={8} /></View>
                             <NuText variant='bold' className='text-whitish text-3xl'>{dateParts[2]}</NuText>
                         </View>
                     </View>
                 </View>
                 <View className='p-4'>
-                    <NuText variant='medium' className='text-base'>{type}</NuText>
+                    <NuText variant='medium' className='text-base'>{type?.title}</NuText>
                     <NuText variant='bold' className='text-2xl mt-2 mb-4'>{title}</NuText>
                     <View className='bg-greeyish p-4 rounded-lg'>
                         <NuText className='text-base mb-2'>{description}</NuText>
@@ -104,7 +194,7 @@ const EventDetail = () => {
                                 <ParticipantsIcon width={24} height={24} />
                             </View>
                             <View className='flex-row gap-x-2 items-centeer'>
-                                <NuText variant='medium' className='text-lg'>{participants.length}/{capacity} PEOPLE</NuText>
+                                <NuText variant='medium' className='text-lg'>{quotaWithOwner} PEOPLE</NuText>
                                 <NuText variant='medium' className='text-base text-secondary'>({remainingSlots} LEFT)</NuText>
                             </View>
                         </View>
@@ -112,7 +202,7 @@ const EventDetail = () => {
                             <View className='h-10 w-10 bg-primary rounded-full items-center justify-center'>
                                 <LocationDetailIcon width={24} height={24} />
                             </View>
-                            <NuText variant='medium' className='text-lg'>MONDAY EVENING</NuText>
+                            <NuText variant='medium' className='text-lg'>{location}</NuText>
                         </View>
                     </View>
 
@@ -122,17 +212,17 @@ const EventDetail = () => {
                                 <NuText variant='bold' className="text-white text-xl text-center">Online</NuText>
                             </View>
                         )}
-                        {isEntryFree && (
+                        {isFree && (
                             <View className="bg-tertiary px-2 py-0.5">
                                 <NuText variant='bold' className="text-white text-xl text-center">Free Entry!</NuText>
                             </View>
                         )}
-                        {isLimitedAccess && (
+                        {isLimitedTime && (
                             <View className="bg-quaternary px-2 py-0.5">
                                 <NuText variant='bold' className="text-white text-xl text-center">Limited Access</NuText>
                             </View>
                         )}
-                        {isVipAccess && (
+                        {isPrivate && (
                             <View className="bg-quintuple px-2 py-0.5">
                                 <NuText variant='bold' className="text-blackish text-xl text-center">VIP Access</NuText>
                             </View>
@@ -158,10 +248,25 @@ const EventDetail = () => {
                     </View>
                 </View>
             </ScrollView>
-
-            <TouchableOpacity onPress={() => { }} className='fixed bottom-0 bg-primary h-20 items-center justify-center pb-2 rounded-[14px]'>
-                <NuText variant='extraBold' className='text-2xl text-white'>ATTEND NOW</NuText>
-            </TouchableOpacity>
+            {
+                isUserEventOwner && (
+                    <TouchableOpacity onPress={() => router.push(editEventLink)} className='fixed bottom-0 bg-secondary h-20 items-center justify-center pb-2 rounded-[14px]'>
+                        <NuText variant='extraBold' className='text-2xl text-white'>EDIT EVENT</NuText>
+                    </TouchableOpacity>
+                )
+            }
+            {
+                !isUserEventOwner && (
+                    isUserParticipant ?
+                        <TouchableOpacity onPress={handleLeave} disabled={onProgress} className='fixed bottom-0 bg-quaternary h-20 items-center justify-center pb-2 rounded-[14px]'>
+                            <NuText variant='extraBold' className='text-2xl text-white'>{!onProgress ? 'LEAVE' : 'LEAVING...'}</NuText>
+                        </TouchableOpacity>
+                        :
+                        <TouchableOpacity onPress={handleAttend} disabled={onProgress} className='fixed bottom-0 bg-primary h-20 items-center justify-center pb-2 rounded-[14px]'>
+                            <NuText variant='extraBold' className='text-2xl text-white'>{!onProgress ? 'ATTEND NOW' : 'ATTENDING...'}</NuText>
+                        </TouchableOpacity>
+                )
+            }
         </View>
     );
 }

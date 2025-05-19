@@ -1,4 +1,4 @@
-import { useAppSelector } from "@/src/hooks/useRedux";
+import { useAppSelector } from "@/src/hooks/common/useRedux";
 import { jwtDecode } from "jwt-decode";
 import { defaultDecodedToken } from "@/src/data/defaultValues";
 

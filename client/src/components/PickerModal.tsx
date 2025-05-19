@@ -42,7 +42,7 @@ const PickerModal: React.FC<PickerModalProps> = ({
                                 onValueChange={onValueChange}
                                 style={{ width: '100%' }}
                             >
-                                {Object.entries(options).map(([key, label]) => (
+                                {options && Object.entries(options).map(([key, label]) => (
                                     <Picker.Item key={key} label={label} value={key} color={COLORS.black} />
                                 ))}
                             </Picker>

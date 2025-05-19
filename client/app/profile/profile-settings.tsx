@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, Button, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
@@ -10,15 +10,16 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Entypo from '@expo/vector-icons/Entypo';
 import * as ImagePicker from 'expo-image-picker';
 import { Toast } from 'toastify-react-native';
-import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { storage } from '@/src/configs/firebase';
-import useAxios from '@/src/hooks/useAxios';
+import useAxios from '@/src/hooks/common/useAxios';
 import { defaultUserCover } from '@/src/data/defaultValues';
-import { useDecodedToken } from '@/src/hooks/useDecodedToken';
+import { useDecodedToken } from '@/src/hooks/common/useDecodedToken';
 import { useUser } from '@/src/hooks/user/useUser';
 import { errorMessages, successMessages } from '@/src/constants/messages';
 import { AxiosError } from 'axios';
-import { ApiErrorProps } from '@/src/types/ApiError.types';
+import { ApiErrorProps } from '@/src/types/api-error';
+import { deleteFromFirebase, uploadImageToFirebase } from '@/src/lib/firebaseOperations';
+import { Image } from 'expo-image';
+import { imageBlurHash } from '@/src/constants/images';
 
 type FormData = {
     name: string;
@@ -90,53 +91,28 @@ const ProfileSettings = () => {
         }
     };
 
-    const deleteFromFirebase = async (fileUrl: string) => {
-        try {
-            const fileRef = ref(storage, fileUrl);
-            await deleteObject(fileRef);
-        } catch (error) {
-            console.warn('Firebase remove error:', error);
-        }
-    };
-    const uploadToFirebase = async (image: any) => {
-        try {
-            const response = await fetch(image.uri);
-            const blob = await response.blob();
-
-            const filename = image.fileName || `photo_${Date.now()}`;
-            const imageRef = ref(storage, `user-photos/${filename}`);
-
-            await uploadBytes(imageRef, blob);
-            const downloadURL = await getDownloadURL(imageRef);
-
-            return downloadURL;
-        } catch (error) {
-            console.error('Firebase upload error:', error);
-        }
-    };
-
     const onSubmit = async (data: FormData) => {
 
         Toast.info("Profile is updating...");
         setOnProgress(true);
-
         try {
-            let photoUrl: string | undefined = undefined;
-
-            if (data.photo && typeof data.photo !== "string") {
-                photoUrl = await uploadToFirebase(data.photo);
+            const { photo, ...restData } = data;
+            let photoUrl: string | boolean | undefined = undefined;
+            if (photo) {
+                if (typeof photo === "string") {
+                    photoUrl = photo;
+                }
+                else {
+                    photoUrl = await uploadImageToFirebase(photo, 'user-photos');
+                }
             }
-            if (!data.photo && oldPhotoUrl) {
+            if (oldPhotoUrl) {
                 await deleteFromFirebase(oldPhotoUrl);
             }
-
-            const { photo, ...restData } = data;
-
             const payload = {
                 ...restData,
-               photo: photoUrl ?? ''
+                photo: photoUrl || '',
             };
-
             const response = await axiosInstance.put(`user/${decodedToken.userId}`, payload);
             Toast.success(response.data.message || successMessages.default);
 
@@ -157,8 +133,13 @@ const ProfileSettings = () => {
                 <View className='gap-y-4 mt-4'>
                     <View className='items-center gap-y-1'>
                         <View className='w-32 h-32 rounded-full overflow-hidden relative'>
-                            <ActivityIndicator size="large" color="#888" className="absolute inset-0" />
-                            {!loading && <Image source={formValues.photo ? (typeof formValues.photo === 'string' ? { uri: formValues.photo } : formValues.photo) : defaultUserCover} className='w-full h-full object-contain' />}
+                            <Image
+                                source={formValues?.photo || defaultUserCover}
+                                contentFit="cover"
+                                transition={500}
+                                placeholder={{ blurhash: imageBlurHash }}
+                                style={{ width: "100%", height: "100%" }}
+                            />
                         </View>
                         {
                             formValues.photo &&

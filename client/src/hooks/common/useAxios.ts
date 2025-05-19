@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useAppStore, useAppDispatch } from "@/src/hooks/useRedux";
+import { useAppStore, useAppDispatch } from "@/src/hooks/common/useRedux";
 import { clearAccessToken, setAccessToken } from "@/src/redux/features/authSlice";
 
 const useAxios = () => {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { Controller, useForm } from 'react-hook-form';
-import useAuthentication from '@/src/hooks/useAuthentication';
+import useAuthentication from '@/src/hooks/common/useAuthentication';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import NuText from '@/src/components/NuText';
 import NuLink from '@/src/components/NuLink';

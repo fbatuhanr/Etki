@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, TextInput, TouchableOpacity } from 'react-native';
 import NuText from '@/src/components/NuText';
 import NuLink from '@/src/components/NuLink';
 import { Controller, useForm } from 'react-hook-form';
@@ -6,7 +6,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import COLORS from '@/src/constants/colors';
 import { useState } from 'react';
 import { Toast } from 'toastify-react-native';
-import useAuthentication from '@/src/hooks/useAuthentication';
+import useAuthentication from '@/src/hooks/common/useAuthentication';
 import { router } from 'expo-router';
 import { errorMessages } from '@/src/constants/messages';
 

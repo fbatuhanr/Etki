@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { Text } from "react-native";
-import { useAppDispatch, useAppSelector } from "@/src/hooks/useRedux";
+import { useAppDispatch, useAppSelector } from "@/src/hooks/common/useRedux";
 import { setAccessToken, clearAccessToken } from "@/src/redux/features/authSlice";
 import { jwtDecode } from "jwt-decode";
-import useAxios from "../hooks/useAxios";
+import useAxios from "@/src/hooks/common/useAxios";
 import { Redirect } from "expo-router";
 
 interface WithAuthCheckProps {

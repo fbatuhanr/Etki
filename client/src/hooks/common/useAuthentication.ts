@@ -1,8 +1,8 @@
-import { useAppDispatch } from "@/src/hooks/useRedux";
+import { useAppDispatch } from "@/src/hooks/common/useRedux";
 import { setAccessToken, clearAccessToken } from "@/src/redux/features/authSlice";
-import useAxios from "@/src/hooks/useAxios";
+import useAxios from "@/src/hooks/common/useAxios";
 import { isApiError } from "@/src/helpers/apiHelpers";
-import { errorMessages } from "../constants/messages";
+import { errorMessages } from "@/src/constants/messages";
 
 const useAuthentication = () => {
   const dispatch = useAppDispatch();

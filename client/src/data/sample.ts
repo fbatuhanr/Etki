@@ -1,3 +1,4 @@
+/*
 import { EventCardProps } from "../components/EventCard";
 
 export const sampleEvents = [
@@ -157,3 +158,4 @@ export const sampleEventTypes = [
         cover: require('@/assets/images/event-types/charity-volunteering.jpg'),
     }
 ]
+*/

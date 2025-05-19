@@ -35,12 +35,12 @@ export default function RootLayout() {
   }
   return (
     <StoreProvider>
-      <ToastManager />
+      <ToastManager duration={2000} />
       <GestureHandlerRootView style={{ flex: 1 }}>
         <StatusBar style="dark" />
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="profile/ProfileSettings"
+          <Stack.Screen name="profile/profile-settings"
             options={{
               headerTransparent: true,
               header: ({ navigation }) => (
@@ -49,6 +49,21 @@ export default function RootLayout() {
                     <TouchableOpacity onPress={() => navigation.goBack()} className='flex-row items-center gap-x-4'>
                       <BackIcon width={24} height={24} />
                       <NuText variant='bold' className='text-2xl text-white'>Profile Settings</NuText>
+                    </TouchableOpacity>
+                  </SafeAreaView>
+                </LinearGradient>
+              )
+            }}
+          />
+          <Stack.Screen name="event/edit-event/[id]"
+            options={{
+              headerTransparent: true,
+              header: ({ navigation }) => (
+                <LinearGradient colors={['rgba(0, 0, 0, 0.9)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0)']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
+                  <SafeAreaView className='flex-row ps-6 pe-8 justify-between'>
+                    <TouchableOpacity onPress={() => navigation.goBack()} className='flex-row items-center gap-x-4'>
+                      <BackIcon width={24} height={24} />
+                      <NuText variant='bold' className='text-2xl text-white'>Edit Event</NuText>
                     </TouchableOpacity>
                   </SafeAreaView>
                 </LinearGradient>

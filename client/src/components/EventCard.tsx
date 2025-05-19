@@ -1,70 +1,54 @@
 import React, { useState } from 'react';
-import { View, Text, Image, ImageSourcePropType, TouchableOpacity } from 'react-native';
-import { DateBackground, LocationIcon, FavIcon, LineIcon } from './Vectors';
-import NuText from '../components/NuText';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { Image } from 'expo-image';
+import { DateBackground, LocationIcon, FavIcon, LineIcon } from '@/src/components/Vectors';
+import NuText from '@/src/components/NuText';
 import { Link } from 'expo-router';
+import { formatDate } from '@/src/utils/dateUtils';
+import { EventCard as IEventCard } from '@/src/types/event';
+import { imageBlurHash } from '@/src/constants/images';
+import { cn } from '../lib/utils';
+import { defaultUserCover } from '../data/defaultValues';
 
 
-export interface ParticipantProps {
-    id: string;
-    image: ImageSourcePropType;
-}
-export interface EventCardProps {
-    id: string;
-    title: string;
-    description: string;
-    cover: ImageSourcePropType;
-    type: 'Social & Networking'
-    | 'Concerts & Performances'
-    | 'Workshops & Classes'
-    | 'Sports & Fitness'
-    | 'Food & Drink'
-    | 'Business & Tech'
-    | 'Art & Creativity'
-    | 'Charity & Volunteering';
-    date: string;
-    capacity: number;
-    location: string;
-    isOnline: boolean;
-    isEntryFree: boolean;
-    isLimitedAccess: boolean;
-    isVipAccess: boolean;
-    participants: ParticipantProps[];
-}
-
-const EventCard: React.FC<EventCardProps> = ({
-    id,
+const EventCard: React.FC<IEventCard> = ({
+    _id,
     title,
-    cover,
-    type,
-    date,
-    capacity,
+    quota,
     location,
+    date,
+    isLimitedTime,
     isOnline,
-    isEntryFree,
-    isLimitedAccess,
-    isVipAccess,
+    isPrivate,
+    isFree,
+    cover,
     participants
 }) => {
     const [isFavorited, setIsFavorited] = useState(false);
-    const dateParts = date.split(' '); // ['30', 'DECEMBER', '18:00']
-    const remainingSlots = capacity - participants.length;
+    const dateParts = formatDate(new Date(date ?? "")).split(" ");
+    const remainingSlots = Number(quota) - (participants?.length ?? 0);
 
-    const targetLink = `/details/${id}`;
+    const targetLink = `/details/${_id}` as const;
 
     return (
         <View className="w-[226px] h-[326px] p-2 mr-2 bg-white rounded-tr-[15px] rounded-br-[15px] rounded-bl-[15px] shadow-[-1px_4px_4px] shadow-greyish">
             <View className="w-[209px] h-[209px] relative overflow-hidden rounded-tr-[15px] rounded-bl-[15px]">
-                <Image source={cover} className="w-full h-full object-cover" resizeMode="cover" />
+                <Image
+                    source={cover}
+                    contentFit="cover"
+                    transition={500}
+                    placeholder={{ blurhash: imageBlurHash }}
+                    style={{ width: "100%", height: "100%" }}
+                />
                 <View className="absolute top-12">
-                    <DateBackground width={58} height={105}/>
+                    <DateBackground width={58} height={105} />
                     <View className="absolute top-4">
                         <View>
                             <NuText variant="bold" className="text-2xl text-whitish -mb-1 text-center">
                                 {dateParts[0]}
                             </NuText>
                             <NuText variant="semiBold" className="text-lg text-whitish text-center">
-                                {dateParts[1].slice(0,3)}
+                                {dateParts[1].slice(0, 3)}
                             </NuText>
                         </View>
                         <LineIcon width={48} height={8} />
@@ -84,17 +68,17 @@ const EventCard: React.FC<EventCardProps> = ({
                             <Text className="text-white text-sm font-nunitoMedium">{remainingSlots} Spots Left!</Text>
                         </View>
                     )}
-                    {isEntryFree && (
+                    {isFree && (
                         <View className="bg-tertiary px-2 rounded-tl-[5px] rounded-bl-[5px] self-end">
                             <Text className="text-white text-sm font-nunitoMedium">Free Entry!</Text>
                         </View>
                     )}
-                    {isLimitedAccess && (
+                    {isLimitedTime && (
                         <View className="bg-quaternary px-2 rounded-tl-[5px] rounded-bl-[5px] self-end">
                             <Text className="text-white text-sm font-nunitoMedium">Limited Access</Text>
                         </View>
                     )}
-                    {isVipAccess && (
+                    {isPrivate && (
                         <View className="bg-quintuple px-2 rounded-tl-[5px] rounded-bl-[5px] self-end">
                             <Text className="text-blackish text-sm font-nunitoMedium">VIP Access</Text>
                         </View>
@@ -107,17 +91,31 @@ const EventCard: React.FC<EventCardProps> = ({
                 </TouchableOpacity>
             </View>
             <Link href={targetLink} className='flex-1 mt-1.5' accessibilityLabel={`View details about ${title}`}>
-                <View className="w-full h-full justify-between pt-1 pb-2 px-3">
+                <View className="w-full h-full justify-between pt-1 pb-1 px-3">
                     <View>
                         <NuText variant="bold" className="text-xl">
                             {title}
                         </NuText>
                     </View>
-                    <View className="flex-row items-center justify-evenly gap-x-2 ps-4 pe-2">
-                        <View className="flex-row items-center">
-                            {participants.slice(0, 3).map((participant, index) => (
-                                <View key={participant.id} className={`w-6 h-6 rounded-full overflow-hidden ${index === 1 || participants.length === 1 ? 'w-8 h-8 border-2 border-white -ml-2.5 -mr-2.5 z-10' : ''}`}>
-                                    <Image source={participant.image} className="w-full h-full object-cover scale-[1.2]" resizeMode="cover" />
+                    <View className="flex-row items-center justify-evenly gap-x-2 ps-4 pe-2 border-t border-b py-0.5 border-neutral-200">
+                        <View className='flex-row justify-center items-center'>
+                            {Array(3).fill(null).map((_, i) =>
+                                participants.slice(0, 3)[i - Math.floor((3 - participants.length) / 2)] || null
+                            ).map((participant, index) => (
+                                <View
+                                    key={participant?._id || `placeholder-${index}`}
+                                    className={cn(
+                                        "w-6 h-6 rounded-full overflow-hidden",
+                                        index === 1 && "w-8 h-8 border-2 border-white -ml-1 -mr-1 z-10"
+                                    )}
+                                >
+                                    <Image
+                                        source={participant?.photo || defaultUserCover}
+                                        contentFit="cover"
+                                        transition={500}
+                                        placeholder={{ blurhash: imageBlurHash }}
+                                        style={{ width: "100%", height: "100%", }}
+                                    />
                                 </View>
                             ))}
                         </View>
@@ -125,7 +123,7 @@ const EventCard: React.FC<EventCardProps> = ({
                             {/* {participants.length > 3 && (
                             <NuText variant="bold">+{participants.length - 3} participants</NuText>
                         )} */}
-                            <NuText variant='semiBold'>+{participants.length} participants</NuText>
+                            <NuText variant='semiBold'>+{participants?.length} participants</NuText>
                         </View>
                     </View>
                     <View className="flex-row items-center gap-x-1">

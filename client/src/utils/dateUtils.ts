@@ -96,3 +96,13 @@ export const isDateLabelCustom = (label?: string): boolean => {
 
     return !predefinedLabels.includes(label);
 };
+
+export const formatDate = (date: Date): string => {
+    if (!date) return '';
+    const day = date.getDate().toString().padStart(2, '0'); // '30'
+    const month = date.toLocaleString('en-US', { month: 'long' }).toUpperCase(); // 'DECEMBER'
+    const hours = date.getHours().toString().padStart(2, '0'); // '18'
+    const minutes = date.getMinutes().toString().padStart(2, '0'); // '00'
+
+    return `${day} ${month} ${hours}:${minutes}`; // '30 DECEMBER 18:00'
+};
