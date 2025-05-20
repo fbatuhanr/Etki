@@ -9,6 +9,7 @@ import { initializeSocket } from "./socket";
 
 /* Import Routes */
 import { user } from "./features/user";
+import { friend } from "./features/friend";
 import { event } from "./features/event";
 import { auth } from "./features/auth";
 import errorHandler from "./middleware/errorHandler";
@@ -45,6 +46,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/user", user);
+app.use("/friend", friend);
 app.use("/event", event);
 app.use("/auth", auth);
 app.use(errorHandler);

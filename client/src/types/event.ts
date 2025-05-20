@@ -44,3 +44,5 @@ export type EventCard = Pick<
     | "participants"
     | "type"
 >;
+
+export type EventCardHistory = Pick<Event, "_id" | "title" | "cover" | "date">;

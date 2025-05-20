@@ -1,26 +1,32 @@
-import React, { useState } from 'react';
-import { View, Text, Image, ImageSourcePropType, TouchableOpacity } from 'react-native';
-import { DateBackground, LocationIcon, FavIcon, LineIcon } from './Vectors';
+import React from 'react';
+import { View } from 'react-native';
+import { Image } from 'expo-image';
+import { DateBackground, LineIcon } from './Vectors';
 import NuText from '../components/NuText';
 import { Link } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { clipText } from '../utils/textUtils';
+import { EventCardHistory as IEventCardHistory } from '../types/event';
+import { formatDate } from '../utils/dateUtils';
+import { imageBlurHash } from '../constants/images';
+import { cn } from '../lib/utils';
 
-
-export interface EventCardHistoryProps {
-    id: string;
-    title: string;
-    cover: ImageSourcePropType;
-    date: string;
-}
-
-const EventCardHistory: React.FC<EventCardHistoryProps> = ({ id, title, cover, date }) => {
-    const dateParts = date.split(' ');
-
-    const targetLink = `/details/${id}`;
+const EventCardHistory: React.FC<IEventCardHistory> = ({ _id, title, cover, date }) => {
+    const isDatePassed = new Date(date ?? "").getTime() < Date.now();
+    const dateParts = formatDate(new Date(date ?? "")).split(" ");
+    const targetLink = `/details/${_id}` as const;
     return (
-        <View className="w-[180px] h-[180px] mr-3 relative rounded-[15px] overflow-hidden shadow-[-1px_4px_4px] shadow-greyish">
-            <Image source={cover} className="w-full h-full object-cover" resizeMode="cover" />
+        <View className={cn(
+            'w-[180px] h-[180px] mr-3 relative rounded-[15px] overflow-hidden shadow-[-1px_4px_4px] shadow-greyish',
+            isDatePassed ? 'opacity-50' : 'opacity-100',
+        )}>
+            <Image
+                source={cover}
+                contentFit="cover"
+                transition={500}
+                placeholder={{ blurhash: imageBlurHash }}
+                style={{ width: "100%", height: "100%" }}
+            />
             <View className='absolute h-2/3 left-0 right-0 bottom-0 justify-end'>
                 <LinearGradient
                     colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.6)', 'rgba(0, 0, 0, 1)']}

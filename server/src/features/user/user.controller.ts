@@ -51,6 +51,21 @@ export async function signup(req: Request, res: Response, next: NextFunction): P
   }
 }
 
+export async function searchUsers(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const query = req.query.q as string;
+    const currentUserId = req.user!.userId;
+    if (!query) {
+      res.status(400).json({ message: "Query string is required." });
+      return;
+    }
+    const users = await userService.searchUsers(query, currentUserId);
+    res.status(200).json({ data: users });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function get(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
   try {
     if (!req.user || req.user.userId !== req.params.id) {
@@ -72,36 +87,5 @@ export async function update(req: Request, res: Response, next: NextFunction): P
     res.status(201).json({ message: 'Profile successfully updated!' })
   } catch (error) {
     next(error);
-  }
-}
-
-export async function checkEventIfFavorited( req: CustomRequest, res: Response, next: NextFunction) {
-  try {
-    const { userId } = req.user!;
-    const eventId = req.params.eventId;
-    const isFavorited = await userService.checkEventIfFavorited(userId, eventId);
-    res.status(200).json({ isFavorited });
-  } catch (err) {
-    next(err);
-  }
-}
-export async function addEventFavorite(req: CustomRequest, res: Response, next: NextFunction) {
-  try {
-    const { userId } = req.user!;
-    const eventId = req.params.eventId;
-    await userService.addEventFavorite(userId, eventId);
-    res.status(200).json({ message: "Added to favorites" });
-  } catch (err) {
-    next(err);
-  }
-}
-export async function removeEventFavorite(req: CustomRequest, res: Response, next: NextFunction) {
-  try {
-    const userId = req.user!.userId;
-    const eventId = req.params.eventId;
-    await userService.removeEventFavorite(userId, eventId);
-    res.status(200).json({ message: "Removed from favorites" });
-  } catch (err) {
-    next(err);
   }
 }

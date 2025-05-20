@@ -10,7 +10,7 @@ const UserSchema = new Schema({
     photo: { type: String },
     biography: { type: String },
     isPublic: { type: Boolean, default: true },
-    // friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Event" }]
   },
   {

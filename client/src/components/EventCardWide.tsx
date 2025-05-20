@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { DateBackground, LocationIcon, FavIcon, LineIcon } from './Vectors';
 import NuText from '../components/NuText';
@@ -10,6 +10,7 @@ import { cn } from '../lib/utils';
 import { Image } from 'expo-image';
 import { imageBlurHash } from '../constants/images';
 import { clipText } from '../utils/textUtils';
+import { useEventFavorite } from '../hooks/event/useEventFavorite';
 
 const EventCardWide: React.FC<Event> = ({
     _id,
@@ -25,14 +26,10 @@ const EventCardWide: React.FC<Event> = ({
     cover,
     participants
 }) => {
-    const [isFavorited, setIsFavorited] = useState(false);
+    const { isFavorited, onProgress, handleFavorite } = useEventFavorite(_id);
     const dateParts = formatDate(new Date(date ?? "")).split(" ");
     const remainingSlots = Number(quota) - (participants?.length ?? 0);
-
-    console.log('participants', participants);
-
     const targetLink = `/details/${_id}` as const;
-
     return (
         <View className="w-full h-[310px] p-3 mb-3 bg-white rounded-[10px] shadow-[-1px_4px_4px] shadow-greyish">
             <View className="w-full h-[200px] relative overflow-hidden rounded-[10px]">
@@ -92,8 +89,10 @@ const EventCardWide: React.FC<Event> = ({
                     )}
                 </View>
                 <Link href={targetLink} className='absolute top-0 right-0 bottom-0 left-0' accessibilityLabel={`View details about ${title}`}></Link>
-                <TouchableOpacity className="bg-white rounded-tl-lg pl-2 pr-0.5 pt-2 absolute bottom-0 right-0"
-                    onPress={() => setIsFavorited(!isFavorited)}>
+                <TouchableOpacity
+                    disabled={onProgress}
+                    onPress={handleFavorite}
+                    className="bg-white rounded-tl-lg pl-2 pr-0.5 pt-2 absolute bottom-0 right-0">
                     <FavIcon isFilled={isFavorited} width={22} height={22} viewBox='0 0 16 16' />
                 </TouchableOpacity>
             </View>

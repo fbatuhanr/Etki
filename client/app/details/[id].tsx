@@ -19,38 +19,33 @@ import { useEvent } from '@/src/hooks/event/useEvent';
 import useAxios from '@/src/hooks/common/useAxios';
 import { errorMessages, successMessages } from '@/src/constants/messages';
 import { Toast } from 'toastify-react-native';
-import { useUserFavorites } from '@/src/hooks/user/useUserFavorites';
+import { set } from 'react-hook-form';
+import { useEventFavorite } from '@/src/hooks/event/useEventFavorite';
 
 const EventDetail = () => {
     const { id } = useLocalSearchParams();
     const decodedToken = useDecodedToken();
-    console.log('id:', id);
     const axiosInstance = useAxios();
 
     const [onProgress, setOnProgress] = useState(false);
+    const { isFavorited, onProgress: favoriteOnProgress, handleFavorite } = useEventFavorite(id as string);
 
     const { getEventById } = useEvent();
     const [event, setEvent] = useState<Event | null>(null);
     const { title, description, quota, type, location, date, isLimitedTime, isOnline, isPrivate, isFree, cover, participants, creator } = event || {};
 
-    const { checkEventIfFavorited, addEventToFavorites, removeEventFromFavorites } = useUserFavorites();
-    const [isFavorited, setIsFavorited] = useState(false);
-
     const dateParts = formatDate(new Date(date ?? "")).split(" ");
     const remainingSlots = Number(quota) - (participants?.length ?? 0) + 1;
-
     const quotaWithOwner = Number(quota) + 1;
 
     const isUserEventOwner = creator?._id === decodedToken?.userId;
     const isUserParticipant = participants?.some((participant) => participant._id === decodedToken?.userId);
-
     const editEventLink = `/event/edit-event/${id}` as const;
 
     useFocusEffect(
         useCallback(() => {
             const fetchData = async () => {
                 setEvent(await getEventById(id as string));
-                setIsFavorited(await checkEventIfFavorited(id as string));
             };
             fetchData();
         }, [])
@@ -93,32 +88,6 @@ const EventDetail = () => {
         }
     };
 
-    const handleFavorite = async () => {
-        if (!id) return;
-        if (!decodedToken.userId) {
-            Toast.error("You need to be logged in to favorite an event.");
-            router.push('/(tabs)/profile/login');
-            return;
-        }
-        try {
-            if (!isFavorited) {
-                const responseData = await addEventToFavorites(id as string);
-                Toast.success(responseData.message || successMessages.favoriteAdded);
-                setIsFavorited(true);
-            } else {
-                const responseData = await removeEventFromFavorites(id as string);
-                Toast.success(responseData.message || successMessages.favoriteRemoved);
-                setIsFavorited(false);
-            }
-        }
-        catch {
-            Toast.error(errorMessages.default);
-        }
-        finally {
-            setOnProgress(false);
-        }
-    };
-
     const handleShare = async () => {
         const message = 'Event Name: Example Event\nJoin us at this amazing event!';
         const isSharingAvailable = await Sharing.isAvailableAsync();
@@ -128,7 +97,6 @@ const EventDetail = () => {
             alert('Sharing is not available on this device');
         }
     };
-
 
     return (
         <View className='flex-1 bg-whitish'>

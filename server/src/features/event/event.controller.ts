@@ -11,7 +11,6 @@ export async function createEvent(req: Request, res: Response, next: NextFunctio
     next(error);
   }
 };
-
 export async function updateEvent(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { id } = req.params;
@@ -41,7 +40,7 @@ export async function attendEvent(req: CustomRequest, res: Response, next: NextF
     next(err);
   }
 };
-export async function leaveEvent( req: CustomRequest, res: Response, next: NextFunction) {
+export async function leaveEvent(req: CustomRequest, res: Response, next: NextFunction) {
   try {
     const { userId } = req.user!;
     const eventId = req.params.eventId;
@@ -98,7 +97,7 @@ export async function filterEvents(req: Request, res: Response, next: NextFuncti
 export async function getCreatedEvents(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { userId } = req.params;
-    const events = await eventService.fetchCreatedEventsByUser(userId);
+    const events = await eventService.getCreatedEventsByUser(userId);
     res.status(200).json({ message: "Created events fetched successfully", data: events });
   } catch (error) {
     next(error);
@@ -107,9 +106,49 @@ export async function getCreatedEvents(req: Request, res: Response, next: NextFu
 export async function getJoinedEvents(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { userId } = req.params;
-    const events = await eventService.fetchJoinedEventsByUser(userId);
+    const events = await eventService.getJoinedEventsByUser(userId);
     res.status(200).json({ message: "Joined events fetched successfully", data: events });
   } catch (error) {
     next(error);
+  }
+}
+
+export async function getFavoriteEventsByUser(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { userId } = req.params;
+    const events = await eventService.getFavoriteEventsByUser(userId as string);
+    res.status(200).json({ data: events });
+  } catch (err) {
+    next(err);
+  }
+}
+export async function checkEventIsFavorited(req: CustomRequest, res: Response, next: NextFunction) {
+  try {
+    const { userId } = req.user!;
+    const eventId = req.params.eventId;
+    const isFavorited = await eventService.checkEventIsFavorited(userId, eventId);
+    res.status(200).json({ isFavorited });
+  } catch (err) {
+    next(err);
+  }
+}
+export async function addEventFavorite(req: CustomRequest, res: Response, next: NextFunction) {
+  try {
+    const { userId } = req.user!;
+    const eventId = req.params.eventId;
+    await eventService.addEventFavorite(userId, eventId);
+    res.status(200).json({ message: "Added to favorites" });
+  } catch (err) {
+    next(err);
+  }
+}
+export async function removeEventFavorite(req: CustomRequest, res: Response, next: NextFunction) {
+  try {
+    const userId = req.user!.userId;
+    const eventId = req.params.eventId;
+    await eventService.removeEventFavorite(userId, eventId);
+    res.status(200).json({ message: "Removed from favorites" });
+  } catch (err) {
+    next(err);
   }
 }

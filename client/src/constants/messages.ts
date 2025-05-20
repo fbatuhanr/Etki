@@ -12,6 +12,12 @@ const successMessages = {
     favoriteRemoved: "Event removed from favorites!",
     eventNotFound: "Event not found!",
     userNotFound: "User not found!",
+    friendRemoved: "Friend removed successfully!",
+    friendRequestSent: "Friend request sent successfully!",
+    friendRequestAccepted: "Friend request accepted successfully!",
+    friendRequestRejected: "Friend request rejected successfully!",
+    friendRequestCancelled: "Friend request cancelled successfully!",
+    friendRequestReceived: "You have a new friend request!",
 };
 const errorMessages = {
     default: "An unexpected error occurred. Please try again later!",
@@ -28,6 +34,14 @@ const errorMessages = {
     userNotFound: "User not found. Please check the username or email.",
     favoriteAdded: "Failed to add event to favorites. Please try again.",
     favoriteRemoved: "Failed to remove event from favorites. Please try again.",
+    friendRemoved: "Failed to remove friend. Please try again.",
+    friendRequestSent: "Failed to send friend request. Please try again.",
+    friendRequestAccepted: "Failed to accept friend request. Please try again.",
+    friendRequestRejected: "Failed to reject friend request. Please try again.",
+    friendRequestCancelled: "Failed to cancel friend request. Please try again.",
+    friendRequestReceived: "Failed to receive friend request. Please try again.",
+    friendRequestNotFound: "Friend request not found. Please check the request ID.",
+    friendRequestAlreadySent: "Friend request already sent. Please check your requests.",
 };
 
 export { successMessages, errorMessages };

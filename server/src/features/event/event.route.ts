@@ -13,6 +13,11 @@ router.post("/", authenticateToken, eventController.createEvent);
 router.post("/:eventId/attend", authenticateToken, eventController.attendEvent);
 router.post("/:eventId/leave", authenticateToken, eventController.leaveEvent);
 
+router.get("/:eventId/is-favorited", authenticateToken, eventController.checkEventIsFavorited);
+router.post("/:eventId/favorite", authenticateToken, eventController.addEventFavorite);
+router.delete("/:eventId/favorite", authenticateToken, eventController.removeEventFavorite);
+router.get("/favorites/:userId", authenticateToken, eventController.getFavoriteEventsByUser);
+
 router.get("/", eventController.getAllEvents);
 router.get("/filter", eventController.filterEvents);
 router.get('/created/:userId', eventController.getCreatedEvents);

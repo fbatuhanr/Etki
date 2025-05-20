@@ -1,6 +1,7 @@
 import mongoose, { Types, UpdateQuery } from "mongoose";
 import Event from "./event.model";
-import EventType from "./event_type.model";
+import EventType from "./event-type.model";
+import User from "../user/user.model";
 import { escapeRegex } from "../../utils/regex";
 
 export async function createEvent(data: any, userId: string) {
@@ -152,7 +153,7 @@ export async function filterEvents(filters: any[], query?: string) {
     { $sort: sort },
     {
       $lookup: {
-        from: "event_types",
+        from: "eventtypes",
         localField: "typeId",
         foreignField: "_id",
         as: "type",
@@ -180,10 +181,35 @@ export async function filterEvents(filters: any[], query?: string) {
   return events;
 };
 
-export async function fetchCreatedEventsByUser(userId: string) {
+export async function getCreatedEventsByUser(userId: string) {
   return Event.find({ createdBy: userId }).lean();
 };
-
-export async function fetchJoinedEventsByUser(userId: string) {
+export async function getJoinedEventsByUser(userId: string) {
   return Event.find({ participants: userId }).lean();
 };
+
+export async function getFavoriteEventsByUser(userId: string) {
+  const user = await User.findById(userId).select("favorites");
+  if (!user) throw new Error("User not found.");
+
+  return await Event.find({ _id: { $in: user.favorites } });
+}
+export async function checkEventIsFavorited(userId: string, eventId: string): Promise<boolean> {
+  const user = await User.findById(userId).select("favorites");
+  if (!user) throw new Error("User not found.");
+  return user.favorites.some((fav) => fav.toString() === eventId);
+}
+export async function addEventFavorite(userId: string, eventId: string) {
+  const user = await User.findById(userId);
+  if (!user) throw new Error("User not found.");
+  const alreadyFavorited = user.favorites.some((id) => id.toString() === eventId);
+  if (alreadyFavorited) throw new Error("Event already favorited.");
+  user.favorites.push(new Types.ObjectId(eventId));
+  await user.save();
+}
+export async function removeEventFavorite(userId: string, eventId: string) {
+  const user = await User.findById(userId);
+  if (!user) throw new Error("User not found.");
+  user.favorites = user.favorites.filter((fav) => fav.toString() !== eventId);
+  await user.save();
+}

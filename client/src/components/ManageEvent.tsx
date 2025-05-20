@@ -82,7 +82,6 @@ const ManageEvent: React.FC<ManageEventProps> = ({ id }) => {
         if (!eventTypes) return;
         if (id) {
             getEventById(id).then((response) => {
-                console.log('response:', response);
                 reset({
                     title: response.title ?? '',
                     description: response.description ?? '',
@@ -247,7 +246,7 @@ const ManageEvent: React.FC<ManageEventProps> = ({ id }) => {
 
     return (
         <SafeAreaView edges={['top']} className='flex-1'>
-            <ScrollView className={cn('mx-5', id && 'mt-8')}>
+            <ScrollView className={cn('mx-5', id && 'mt-8')} showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false}>
                 <View className='flex-row gap-x-2 mt-8 mb-6'>
                     {
                         id ?

@@ -1,5 +1,5 @@
 import User from "./user.model";
-// import FriendRequest from "../friendRequest/friendRequest.model";
+import FriendRequest from "../friend/friend.model";
 import bcrypt from "bcryptjs";
 import { generateAccessToken, generateRefreshToken } from "../auth/auth.service";
 import { Types } from "mongoose";
@@ -23,9 +23,7 @@ export async function login(data: UserProps) {
   });
   return { accessToken, refreshToken };
 }
-export async function logout() {
-  return;
-}
+export async function logout() { return; }
 export async function signup(data: UserProps) {
   const newUser = new User(data);
   newUser.hashPassword = bcrypt.hashSync(data.password, 10);
@@ -56,30 +54,55 @@ export async function signup(data: UserProps) {
   return savedUser ? true : false;
 }
 
+export async function searchUsers(query: string, currentUserId: string) {
+  const regex = new RegExp(query, "i");
+
+  const currentUser = await User.findById(currentUserId).select("friends");
+  const friendIds = currentUser?.friends.map(id => id.toString()) || [];
+
+  const incomingRequests = await FriendRequest.find({
+    to: currentUserId,
+    status: "pending",
+  }).select("from");
+  const incomingRequestIds = incomingRequests.map(req => req.from.toString());
+
+  const excludeIds = [
+    currentUserId,
+    ...friendIds,
+    ...incomingRequestIds
+  ];
+
+  const users = await User.find({
+    $or: [
+      { username: regex },
+      { name: regex },
+      { surname: regex },
+    ],
+    _id: { $nin: excludeIds }
+  }).select("_id username name surname photo");
+
+  const outgoingRequests = await FriendRequest.find({
+    from: currentUserId,
+    status: "pending",
+    to: { $in: users.map(u => u._id) }
+  }).select("to");
+
+  const outgoingMap = new Set(outgoingRequests.map(req => req.to.toString()));
+
+  return users.map((user) => ({
+    _id: user._id.toString(),
+    username: user.username,
+    name: user.name,
+    surname: user.surname,
+    photo: user.photo,
+    hasPendingRequest: outgoingMap.has(user._id.toString())
+  }));
+}
+
+
 export async function get(id: string) {
   return User.findById(id);
 }
 export async function update(id: string, data: UserProps) {
   return User.findOneAndUpdate({ _id: id }, data);
-}
-
-export async function checkEventIfFavorited(userId: string, eventId: string): Promise<boolean> {
-  const user = await User.findById(userId).select("favorites");
-  if (!user) throw new Error("User not found.");
-  return user.favorites.some((fav) => fav.toString() === eventId);
-}
-export async function addEventFavorite(userId: string, eventId: string) {
-  const user = await User.findById(userId);
-  if (!user) throw new Error("User not found.");
-  const alreadyFavorited = user.favorites.some((id) => id.toString() === eventId);
-  if (alreadyFavorited) throw new Error("Event already favorited.");
-  user.favorites.push(new Types.ObjectId(eventId));
-  await user.save();
-}
-
-export async function removeEventFavorite(userId: string, eventId: string) {
-  const user = await User.findById(userId);
-  if (!user) throw new Error("User not found.");
-  user.favorites = user.favorites.filter((fav) => fav.toString() !== eventId);
-  await user.save();
 }

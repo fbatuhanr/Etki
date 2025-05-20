@@ -70,6 +70,36 @@ export default function RootLayout() {
               )
             }}
           />
+          <Stack.Screen name="profile/friends"
+            options={{
+              headerTransparent: true,
+              header: ({ navigation }) => (
+                <LinearGradient colors={['rgba(0, 0, 0, 0.9)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0)']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
+                  <SafeAreaView className='flex-row ps-6 pe-8 justify-between'>
+                    <TouchableOpacity onPress={() => navigation.goBack()} className='flex-row items-center gap-x-4'>
+                      <BackIcon width={24} height={24} />
+                      <NuText variant='bold' className='text-2xl text-white'>Back to Profile</NuText>
+                    </TouchableOpacity>
+                  </SafeAreaView>
+                </LinearGradient>
+              )
+            }}
+          />
+          <Stack.Screen name="profile/[id]"
+            options={{
+              headerTransparent: true,
+              header: ({ navigation }) => (
+                <LinearGradient colors={['rgba(0, 0, 0, 0.9)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0)']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
+                  <SafeAreaView className='flex-row ps-6 pe-8 justify-between'>
+                    <TouchableOpacity onPress={() => navigation.goBack()} className='flex-row items-center gap-x-4'>
+                      <BackIcon width={24} height={24} />
+                      <NuText variant='bold' className='text-2xl text-white'>Back</NuText>
+                    </TouchableOpacity>
+                  </SafeAreaView>
+                </LinearGradient>
+              )
+            }}
+          />
           <Stack.Screen name="+not-found" options={{ title: 'Page Not Found' }} />
         </Stack>
       </GestureHandlerRootView>

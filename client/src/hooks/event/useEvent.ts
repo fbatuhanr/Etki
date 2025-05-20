@@ -24,7 +24,7 @@ export const useEvent = () => {
       return responseData.data;
     } catch (err: unknown) {
       const axiosError = err as AxiosError<ApiErrorProps>;
-      throw new Error(axiosError.response?.data?.message || errorMessages.eventNotFound)
+      throw new Error(axiosError.response?.data?.message || errorMessages.default)
     }
   };
 
@@ -32,14 +32,25 @@ export const useEvent = () => {
     try {
       const { data: responseData } = await axiosInstance.get(`/event/created/${userId}`);
       return responseData.data;
-    } catch (err: any) {
-      throw new Error(err.message);
+    } catch (err: unknown) {
+      const axiosError = err as AxiosError<ApiErrorProps>;
+      throw new Error(axiosError.response?.data?.message || errorMessages.default)
     }
   };
 
   const getJoinedEvents = async (userId: string) => {
     try {
       const { data: responseData } = await axiosInstance.get(`/event/joined/${userId}`);
+      return responseData.data;
+    } catch (err: unknown) {
+      const axiosError = err as AxiosError<ApiErrorProps>;
+      throw new Error(axiosError.response?.data?.message || errorMessages.default)
+    }
+  };
+
+  const getFavoritedEvents = async (userId: string) => {
+    try {
+      const { data: responseData } = await axiosInstance.get(`/event/favorites/${userId}`);
       return responseData.data;
     } catch (err: any) {
       throw new Error(err.message);
@@ -50,8 +61,9 @@ export const useEvent = () => {
     try {
       const { data: responseData } = await axiosInstance.get("/event/filter", { params });
       return responseData.data;
-    } catch (err: any) {
-      throw new Error(err.message);
+    } catch (err: unknown) {
+      const axiosError = err as AxiosError<ApiErrorProps>;
+      throw new Error(axiosError.response?.data?.message || errorMessages.default)
     }
   };
 
@@ -59,8 +71,9 @@ export const useEvent = () => {
     try {
       const { data: responseData } = await axiosInstance.post("/event", eventData);
       return responseData.data;
-    } catch (err: any) {
-      throw new Error(err.message);
+    } catch (err: unknown) {
+      const axiosError = err as AxiosError<ApiErrorProps>;
+      throw new Error(axiosError.response?.data?.message || errorMessages.default)
     }
   };
 
@@ -69,6 +82,7 @@ export const useEvent = () => {
     getEventById,
     getCreatedEvents,
     getJoinedEvents,
+    getFavoritedEvents,
     filterEvents,
     createEvent
   };

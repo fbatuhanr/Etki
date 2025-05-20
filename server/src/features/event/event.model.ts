@@ -3,7 +3,7 @@ const eventSchema = new Schema(
   {
     title: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true },
-    typeId: { type: Types.ObjectId, ref: "EventTypes", required: true },
+    typeId: { type: Types.ObjectId, ref: "EventType", required: true },
     quota: { type: String },
     location: { type: String, required: true, trim: true },
     date: { type: Date, required: true },

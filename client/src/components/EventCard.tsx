@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { DateBackground, LocationIcon, FavIcon, LineIcon } from '@/src/components/Vectors';
 import NuText from '@/src/components/NuText';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { formatDate } from '@/src/utils/dateUtils';
 import { EventCard as IEventCard } from '@/src/types/event';
 import { imageBlurHash } from '@/src/constants/images';
 import { cn } from '../lib/utils';
 import { defaultUserCover } from '../data/defaultValues';
-
+import { useEventFavorite } from '../hooks/event/useEventFavorite';
 
 const EventCard: React.FC<IEventCard> = ({
     _id,
@@ -24,12 +24,10 @@ const EventCard: React.FC<IEventCard> = ({
     cover,
     participants
 }) => {
-    const [isFavorited, setIsFavorited] = useState(false);
+    const { isFavorited, onProgress, handleFavorite } = useEventFavorite(_id);
     const dateParts = formatDate(new Date(date ?? "")).split(" ");
     const remainingSlots = Number(quota) - (participants?.length ?? 0);
-
     const targetLink = `/details/${_id}` as const;
-
     return (
         <View className="w-[226px] h-[326px] p-2 mr-2 bg-white rounded-tr-[15px] rounded-br-[15px] rounded-bl-[15px] shadow-[-1px_4px_4px] shadow-greyish">
             <View className="w-[209px] h-[209px] relative overflow-hidden rounded-tr-[15px] rounded-bl-[15px]">
@@ -85,8 +83,11 @@ const EventCard: React.FC<IEventCard> = ({
                     )}
                 </View>
                 <Link href={targetLink} className='absolute top-0 right-0 bottom-0 left-0' accessibilityLabel={`View details about ${title}`}></Link>
-                <TouchableOpacity className="bg-white rounded-tl-lg pl-2 pr-0.5 pt-2 absolute bottom-0 right-0"
-                    onPress={() => setIsFavorited(!isFavorited)}>
+                <TouchableOpacity
+                    disabled={onProgress}
+                    onPress={handleFavorite}
+                    className="bg-white rounded-tl-lg pl-2 pr-0.5 pt-2 absolute bottom-0 right-0"
+                >
                     <FavIcon isFilled={isFavorited} width={16} height={16} />
                 </TouchableOpacity>
             </View>
