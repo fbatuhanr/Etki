@@ -37,23 +37,20 @@ const Signup = () => {
     }
   });
   const formValues = watch();
-  const onSubmit = async (data: FormData) => {
 
-    setIsSubmitProcessing(true);
-    Toast.info("Information is being checked...");
-
-    try {
-      const response = await signupCall(data.fullName, data.username, data.email, data.password);
-      Toast.success(response);
-
-      router.replace('/(tabs)/profile/login');
-
-    } catch (error) {
-      Toast.error(errorMessages.default);
-    } finally {
-      setIsSubmitProcessing(false);
-    }
+const onSubmit = async (data: FormData) => {
+  setIsSubmitProcessing(true);
+  Toast.info("Information is being checked...");
+  try {
+    await signupCall(data.fullName, data.username, data.email, data.password);
+    router.replace("/(tabs)/profile/login");
+  } catch (error: any) {
+    // console.error("Signup error:", error);
+  } finally {
+    setIsSubmitProcessing(false);
   }
+};
+
 
   const textInputClasses = 'font-nunitoBold text-2xl bg-greayish rounded-2xl h-16 px-6';
   return (

@@ -8,6 +8,7 @@ router.post("/request/:toUserId", authenticateToken, friendController.sendFriend
 router.post("/accept-by-user/:fromUserId", authenticateToken, friendController.acceptFriendRequestByUser);
 
 router.get("/requests", authenticateToken, friendController.getIncomingRequests);
+router.get("/sent-requests", authenticateToken, friendController.getSentFriendRequests);
 router.get("/friends/:userId", friendController.getFriendsOfUser);
 router.get("/is-friend/:userId", authenticateToken, friendController.checkIsFriend);
 router.get("/has-request/:userId", authenticateToken,friendController.hasPendingRequest);

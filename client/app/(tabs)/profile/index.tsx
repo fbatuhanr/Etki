@@ -69,15 +69,14 @@ const Profile = () => {
 
     try {
       await logoutCall();
-      Toast.success(successMessages.default);
-      router.replace('/');
-
+      router.replace("/");
     } catch (error) {
-      Toast.error(errorMessages.default);
+      console.error("Logout error:", error); 
     } finally {
       setIsLoading(false);
     }
-  }
+  };
+
   return (
     <UserGuard>
       <TouchableWithoutFeedback onPress={() => { if (showMore) setShowMore(false); }}>

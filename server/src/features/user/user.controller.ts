@@ -68,11 +68,8 @@ export async function searchUsers(req: CustomRequest, res: Response, next: NextF
 
 export async function get(req: CustomRequest, res: Response, next: NextFunction): Promise<void> {
   try {
-    if (!req.user || req.user.userId !== req.params.id) {
-      res.status(403).json({ message: 'Access denied' });
-      return;
-    }
-    res.json(await userService.get(req.params.id));
+    const { id } = req.params;
+    res.json(await userService.get(id));
   } catch (error) {
     next(error)
   }

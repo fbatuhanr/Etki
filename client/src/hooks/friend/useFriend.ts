@@ -47,7 +47,7 @@ export const useFriend = () => {
       setOnProgress(false);
     }
   };
-  
+
   const rejectFriendRequestByUser = async (fromUserId: string) => {
     try {
       setOnProgress(true);
@@ -67,6 +67,18 @@ export const useFriend = () => {
     try {
       setOnProgress(true);
       const { data } = await axiosInstance.get(`/friend/requests`);
+      return data.data;
+    } catch (err: any) {
+      Toast.error(err.response?.data?.message || errorMessages.default);
+      throw err;
+    } finally {
+      setOnProgress(false);
+    }
+  };
+  const getSentRequests = async () => {
+    try {
+      setOnProgress(true);
+      const { data } = await axiosInstance.get(`/friend/sent-requests`);
       return data.data;
     } catch (err: any) {
       Toast.error(err.response?.data?.message || errorMessages.default);
@@ -137,6 +149,7 @@ export const useFriend = () => {
     acceptFriendRequestByUser,
     rejectFriendRequestByUser,
     getIncomingRequests,
+    getSentRequests,
     getFriendsOfUser,
     checkIsFriend,
     checkHasPendingRequest,

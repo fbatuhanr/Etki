@@ -69,6 +69,11 @@ export async function getIncomingRequests(userId: string) {
     .populate("from", "username name surname photo")
     .sort({ createdAt: -1 });
 }
+export async function getSentFriendRequests(userId: string) {
+  return await FriendRequest.find({ from: userId })
+    .populate("to", "username name surname photo")
+    .sort({ createdAt: -1 });
+};
 
 export async function getFriendsOfUser(userId: string) {
   const user = await User.findById(userId).populate("friends", "username name surname photo");

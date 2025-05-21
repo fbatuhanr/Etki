@@ -16,7 +16,7 @@ export type User = {
   updatedAt: string;
 };
 
-export type UserFound = {
+export type UserSearch = {
   _id: string;
   username: string;
   name: string;

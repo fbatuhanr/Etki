@@ -28,23 +28,17 @@ const Login = () => {
     }
   });
   const onSubmit = async (data: FormData) => {
-
     setIsSubmitProcessing(true);
     Toast.info("Information is being checked...");
-
     try {
-      const response = await loginCall(data.username, data.password);
-      Toast.success(response);
-
+      await loginCall(data.username, data.password);
       router.replace('/(tabs)/profile');
-
     } catch (error) {
-      console.error(error);
-      Toast.error(errorMessages.default);
+      // console.error(error);
     } finally {
       setIsSubmitProcessing(false);
     }
-  }
+  };
 
   return (
     <View className='size-full justify-center gap-y-8 px-4'>

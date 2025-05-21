@@ -52,7 +52,7 @@ export async function rejectFriendRequestByUser(req: CustomRequest, res: Respons
 
 export async function getIncomingRequests(req: CustomRequest, res: Response, next: NextFunction) {
   try {
-    const userId = req.user!.userId;
+    const { userId } = req.user!;
 
     const requests = await friendService.getIncomingRequests(userId);
     res.status(200).json({ data: requests });
@@ -60,6 +60,15 @@ export async function getIncomingRequests(req: CustomRequest, res: Response, nex
     next(err);
   }
 }
+export const getSentFriendRequests = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { userId } = req.user!;
+    const sentRequests = await friendService.getSentFriendRequests(userId);
+    res.status(200).json({ data: sentRequests });
+  } catch (err) {
+    next(err);
+  }
+};
 
 export async function getFriendsOfUser(req: Request, res: Response, next: NextFunction) {
   try {
