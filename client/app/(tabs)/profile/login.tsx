@@ -8,7 +8,6 @@ import { useState } from 'react';
 import { Toast } from 'toastify-react-native';
 import useAuthentication from '@/src/hooks/common/useAuthentication';
 import { router } from 'expo-router';
-import { errorMessages } from '@/src/constants/messages';
 
 type FormData = {
   username: string;

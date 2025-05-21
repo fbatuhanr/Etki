@@ -1,5 +1,5 @@
 import React from 'react';
-import ManageEvent from '@/src/components/ManageEvent';
+import ManageEvent from '@/src/components/event/ManageEvent';
 import { useLocalSearchParams } from 'expo-router';
 
 const EditEvent = () => {

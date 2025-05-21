@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Entypo from '@expo/vector-icons/Entypo';
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -11,18 +11,18 @@ import { TouchableWithoutFeedback } from 'react-native';
 import COLORS from '@/src/constants/colors';
 import useAuthentication from '@/src/hooks/common/useAuthentication';
 import { Toast } from 'toastify-react-native';
-import { errorMessages, successMessages } from '@/src/constants/messages';
+import { errorMessages } from '@/src/constants/messages';
 import { useUser } from '@/src/hooks/user/useUser';
 import { useDecodedToken } from '@/src/hooks/common/useDecodedToken';
 import { Image } from 'expo-image';
 import { imageBlurHash } from '@/src/constants/images';
 import { Event } from '@/src/types/event';
-import { useGet } from '@/src/hooks/common/useGet';
 import { useEvent } from '@/src/hooks/event/useEvent';
 import { FlatList, ScrollView } from 'react-native-gesture-handler';
 import { User } from '@/src/types/user';
 import { UserGuard } from '@/src/guards';
-import EventCardHistory from '@/src/components/EventCardHistory';
+import EventCardHistory from '@/src/components/event/EventCardHistory';
+import { useFriend } from '@/src/hooks/friend/useFriend';
 
 const Profile = () => {
   const decodedToken = useDecodedToken();
@@ -36,17 +36,27 @@ const Profile = () => {
   const [joinedEvents, setJoinedEvents] = useState<Event[]>([]);
   const [favoriteEvents, setFavoriteEvents] = useState<Event[]>([]);
 
+  const { getIncomingRequests } = useFriend();
+  const [incomingRequestsCount, setIncomingRequestsCount] = useState(0);
+
   const [isLoading, setIsLoading] = useState(false);
   const [showMore, setShowMore] = useState(false);
 
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      const [cEvents, jEvents, fEvents, user] = await Promise.all([getCreatedEvents(decodedToken.userId), getJoinedEvents(decodedToken.userId), getFavoritedEvents(decodedToken.userId), getUserById(decodedToken.userId)]);
+      const [cEvents, jEvents, fEvents, user, iRequests] = await Promise.all([
+        getCreatedEvents(decodedToken.userId),
+        getJoinedEvents(decodedToken.userId),
+        getFavoritedEvents(decodedToken.userId),
+        getUserById(decodedToken.userId),
+        getIncomingRequests()
+      ]);
       setCreatedEvents(cEvents);
       setJoinedEvents(jEvents);
       setFavoriteEvents(fEvents);
       setUser(user);
+      setIncomingRequestsCount(iRequests.length);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : errorMessages.default;
       Toast.error(errorMessage);
@@ -71,7 +81,7 @@ const Profile = () => {
       await logoutCall();
       router.replace("/");
     } catch (error) {
-      console.error("Logout error:", error); 
+      console.error("Logout error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -142,8 +152,17 @@ const Profile = () => {
                       </View>
                       <Link href={'/profile/friends'}>
                         <View className='border-b border-primary flex-row gap-x-2'>
-                          <NuText variant='extraBold' className='text-2xl text-primary'>0</NuText>
+                          <NuText variant='extraBold' className='text-2xl text-primary'>{user?.friends.length}</NuText>
                           <NuText variant='extraBold' className='text-2xl text-primary'>Friends</NuText>
+                          {
+                            !!incomingRequestsCount &&
+                            <View className='relative'>
+                              <View><AntDesign name="bells" size={24} color={COLORS.primaryActive} /></View>
+                              <View className='absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary justify-center items-center'>
+                                <NuText variant='bold' className='text-sm text-white text-center'>{incomingRequestsCount}</NuText>
+                              </View>
+                            </View>
+                          }
                         </View>
                       </Link>
                     </View>
@@ -152,21 +171,21 @@ const Profile = () => {
                     <View className='h-10 w-10 bg-primary rounded-full items-center justify-center'>
                       <View className='h-8 w-8 bg-whitish rounded-full' />
                     </View>
-                    <NuText variant='bold' className='text-xl text-primary'>0</NuText>
+                    <NuText variant='bold' className='text-xl text-primary'>{joinedEvents.length}</NuText>
                     <NuText variant='medium' className='text-xl'>Event Attends</NuText>
                   </View>
                   <View className='flex-row items-center gap-x-2'>
                     <View className='h-10 w-10 bg-primary rounded-full items-center justify-center'>
                       <View className='h-8 w-8 bg-whitish rounded-full' />
                     </View>
-                    <NuText variant='bold' className='text-xl text-primary'>0</NuText>
+                    <NuText variant='bold' className='text-xl text-primary'>{createdEvents.length}</NuText>
                     <NuText variant='medium' className='text-xl'>Events Created</NuText>
                   </View>
                 </View>
                 <View className='flex-row gap-x-2'>
                   <TouchableOpacity
                     className='bg-primary w-3/5 h-11 rounded-xl flex-row justify-center items-center gap-x-2'
-                    onPress={() => null}
+                    onPress={() => router.push('/message-center')}
                   >
                     <NuText variant='bold' className='text-xl text-white'>Message Center</NuText>
                     <AntDesign name="message1" size={20} color="white" />

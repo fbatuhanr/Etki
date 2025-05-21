@@ -1,0 +1,1 @@
+export { default as eventType } from "./event-type.route";

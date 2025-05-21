@@ -2,9 +2,7 @@ import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import NuText from '@/src/components/NuText';
 import NuLink from '@/src/components/NuLink';
-import EventType from '@/src/components/EventType';
-import { useGet } from '@/src/hooks/common/useGet';
-import { EventType as IEventType } from '@/src/types/event-type';
+import EventType from '@/src/components/event/EventType';
 import { useEventTypes } from '@/src/hooks/event/useEventTypes';
 
 const EventTypes = () => {

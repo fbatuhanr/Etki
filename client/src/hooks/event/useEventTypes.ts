@@ -12,7 +12,7 @@ export const useEventTypes = () => {
         setLoading(true);
         setError(null);
         try {
-            const { data: responseData } = await axiosInstance.get("/event/types");
+            const { data: responseData } = await axiosInstance.get("event-type");
             setEventTypes(responseData.data);
         } catch (err: any) {
             setError(err.message || "Failed to fetch event types");

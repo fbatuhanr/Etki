@@ -17,16 +17,20 @@ export async function sendFriendRequest(fromUserId: string, toUserId: string) {
 }
 
 export async function cancelFriendRequestByUser(fromUserId: string, toUserId: string) {
-  const request = await FriendRequest.findOneAndDelete({
+  const request = await FriendRequest.findOne({
     from: fromUserId,
     to: toUserId,
-    status: "pending"
   });
 
   if (!request) {
-    throw new Error("No pending friend request found to cancel.");
+    throw new Error("No friend request found.");
   }
 
+  if (request.status !== "pending") {
+    throw new Error("This request has already been accepted or rejected.");
+  }
+
+  await request.deleteOne();
   return "Friend request canceled.";
 }
 
@@ -70,10 +74,10 @@ export async function getIncomingRequests(userId: string) {
     .sort({ createdAt: -1 });
 }
 export async function getSentFriendRequests(userId: string) {
-  return await FriendRequest.find({ from: userId })
+  return await FriendRequest.find({ from: userId, status: "pending" })
     .populate("to", "username name surname photo")
     .sort({ createdAt: -1 });
-};
+}
 
 export async function getFriendsOfUser(userId: string) {
   const user = await User.findById(userId).populate("friends", "username name surname photo");
@@ -120,4 +124,18 @@ export async function removeFriend(userId: string, friendId: string) {
   });
 
   return "Friend removed successfully.";
+}
+
+export async function cleanUpAcceptedRequests(userId: string) {
+  const acceptedRequests = await FriendRequest.find({
+    status: "accepted",
+    $or: [{ from: userId }, { to: userId }]
+  });
+
+  for (const request of acceptedRequests) {
+    const fromIsFriend = await checkIsFriend(request.from.toString(), request.to.toString());
+    if (!fromIsFriend) {
+      await request.deleteOne();
+    }
+  }
 }

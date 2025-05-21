@@ -117,3 +117,13 @@ export async function removeFriend(req: CustomRequest, res: Response, next: Next
     next(err);
   }
 }
+
+export async function cleanUpAcceptedRequests(req: CustomRequest, res: Response, next: NextFunction) {
+  try {
+    const { userId } = req.user!;
+    const result = await friendService.cleanUpAcceptedRequests(userId);
+    res.status(200).json({ message: "Cleanup complete", removedCount: result });
+  } catch (err) {
+    next(err);
+  }
+}

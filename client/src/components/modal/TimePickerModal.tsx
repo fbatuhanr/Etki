@@ -1,24 +1,19 @@
 import React from "react";
 import { Modal, View, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
-import NuText from "./NuText";
+import NuText from "@/src/components/NuText";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { getTomorrow } from "../utils/dateUtils";
 
-type DatePickerModalProps = {
+type TimePickerModalProps = {
     title: string;
-    date: Date;
-    minimumDate?: Date;
-    maximumDate?: Date;
+    time: Date;
     visible: boolean;
     onClose: () => void;
-    onChange: (event: any, selectedDate?: Date) => void;
+    onChange: (event: any, selectedTime?: Date) => void;
 };
 
-const DatePickerModal: React.FC<DatePickerModalProps> = ({
+const TimePickerModal: React.FC<TimePickerModalProps> = ({
     title,
-    date,
-    minimumDate,
-    maximumDate,
+    time,
     visible,
     onClose,
     onChange,
@@ -37,13 +32,12 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
                             <NuText variant='bold' className="text-2xl font-bold mb-4">{title}</NuText>
                             <View className="h-96">
                                 <DateTimePicker
-                                    mode='date'
-                                    value={date}
-                                    display='inline'
+                                    mode='time'
+                                    value={time}
+                                    display='spinner'
+                                    minuteInterval={15}
                                     style={{ flex: 1 }}
                                     onChange={onChange}
-                                    minimumDate={minimumDate ?? new Date()}
-                                    maximumDate={maximumDate ? getTomorrow(maximumDate) : undefined}
                                 />
                             </View>
                             <TouchableOpacity
@@ -60,4 +54,4 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
     );
 };
 
-export default DatePickerModal;
+export default TimePickerModal;

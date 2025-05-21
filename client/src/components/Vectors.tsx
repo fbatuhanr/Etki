@@ -1,6 +1,6 @@
 import * as React from "react";
 import Svg, { SvgProps, G, Path, Defs, ClipPath } from "react-native-svg"
-import COLORS from "../constants/colors";
+import COLORS from "@/src/constants/colors";
 
 const ActiveTab = (props: SvgProps) => (
   <Svg fill="none" {...props}>

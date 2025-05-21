@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { View, TouchableOpacity, TextInput } from 'react-native';
 import { FlatList, ScrollView } from 'react-native-gesture-handler';
@@ -8,16 +8,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BackIcon, SearchIcon } from '@/src/components/Vectors';
 import COLORS from '@/src/constants/colors';
 import NuText from '@/src/components/NuText';
-import PickerModal from '@/src/components/PickerModal';
-import CalendarModal from '@/src/components/CalendarModal';
-import EventCardWide from '@/src/components/EventCardWide';
+import PickerModal from '@/src/components/modal/PickerModal';
+import CalendarModal from '@/src/components/modal/CalendarModal';
+import EventCardWide from '@/src/components/event/EventCardWide';
 import { LinearGradient } from 'expo-linear-gradient';
-import { clipText } from '@/src/utils/textUtils';
-import { useGet } from '@/src/hooks/common/useGet';
 import { Event } from '@/src/types/event';
-import { EventType } from '@/src/types/event-type';
 import useAxios from '@/src/hooks/common/useAxios';
 import { useDebouncedValue } from '@/src/hooks/common/useDebouncedValue';
+import { useEventTypes } from '@/src/hooks/event/useEventTypes';
 
 type FilterOptions = {
     sortBy: { [key: string]: string };
@@ -27,13 +25,14 @@ type FilterOptions = {
 const FiltersLayout = () => {
     const axiosInstance = useAxios();
     const { query, sortBy, type, dateLabel, startDate, endDate } = useLocalSearchParams();
-    const { data: eventTypes, loading: eventTypesLoading } = useGet<EventType[]>('/event/types');
+    const { eventTypes, getEventTypes } = useEventTypes();
+
     const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
+    const [loading, setLoading] = useState(false);
 
     const safeQuery = Array.isArray(query) ? query[0] : query ?? '';
-    const [queryString, setQueryString] = useState<string>(safeQuery);
+    const [queryString, setQueryString] = useState(safeQuery);
     const debouncedQuery = useDebouncedValue(queryString, 500);
-    
 
     const filterOptions: FilterOptions = {
         sortBy: {
@@ -77,30 +76,48 @@ const FiltersLayout = () => {
     ]);
 
     useEffect(() => {
+        const fetchData = async () => {
+            getEventTypes();
+        }
+        fetchData();
+    }, []);
+
+    useEffect(() => {
         if (!eventTypes || eventTypes.length === 0) return;
 
         setFilters((prev) => prev.map((f) => f.id === 'type' && f.value ? { ...f, label: filterOptions.type[f.value as string] ?? '' } : f));
     }, [eventTypes]);
+
+    const filterSignature = useMemo(() => {
+        return JSON.stringify(
+            filters.map(f => ({ id: f.id, value: f.value }))
+        );
+    }, [filters]);
+
 
     useEffect(() => {
         if (!eventTypes || eventTypes.length === 0) return;
 
         const fetchFilteredEvents = async () => {
             try {
-                const { data } = await axiosInstance.get("/event/filter", {
+                setLoading(true);
+                const { data: responseData } = await axiosInstance.get("/event/filter", {
                     params: {
                         filters: encodeURIComponent(JSON.stringify(filters)),
                         query: debouncedQuery,
                     },
                 });
-                setFilteredEvents(data);
+                setFilteredEvents(responseData.data);
             } catch (error) {
                 console.error("Filter error", error);
+            }
+            finally {
+                setLoading(false);
             }
         };
 
         fetchFilteredEvents();
-    }, [filters, debouncedQuery, eventTypes]);
+    }, [filterSignature, debouncedQuery, eventTypes]);
 
     const handleFilterApply = (id: string, value: any) => {
         setFilters((prevFilters) =>
@@ -203,8 +220,9 @@ const FiltersLayout = () => {
                                                 className="w-3/5 text-center text-xl leading-tight"
                                                 value={queryString}
                                                 autoCapitalize='none'
+                                                placeholder='Search'
                                                 onChangeText={(text: string) => setQueryString(text)}
-                                                placeholderTextColor={COLORS.white}
+                                                placeholderTextColor="rgba(255, 255, 255, 0.5)"
                                                 style={{ color: COLORS.white }}
                                             />
                                             <TouchableOpacity onPress={() => setQueryString('')}>
@@ -219,24 +237,29 @@ const FiltersLayout = () => {
                 }}
             />
             <View className='min-h-screen'>
-                {filteredEvents.length ? (
-                    <FlatList
-                        data={filteredEvents}
-                        renderItem={({ item }) => <EventCardWide {...item} />}
-                        keyExtractor={(item) => item._id}
-                        showsVerticalScrollIndicator={false}
-                        className="p-4"
-                        ListHeaderComponent={
-                            <SafeAreaView className={query ? 'mt-12' : ''} />
-                        }
-                    />
-                ) : (
-                    <View className="h-full w-full items-center justify-center">
-                        <NuText variant="semiBold" className="text-2xl">
-                            No Results Found
-                        </NuText>
-                    </View>
-                )}
+                {
+                    !loading ?
+                        filteredEvents.length ? (
+                            <FlatList
+                                data={filteredEvents}
+                                renderItem={({ item }) => <EventCardWide {...item} />}
+                                keyExtractor={(item) => item._id}
+                                showsVerticalScrollIndicator={false}
+                                className="p-4"
+                                ListHeaderComponent={
+                                    <SafeAreaView className={query ? 'mt-12' : ''} />
+                                }
+                            />
+                        ) : (
+                            <View className="h-full w-full items-center justify-center">
+                                <NuText variant='regular' className='text-2xl text-grayish'>No Results Found</NuText>
+                            </View>
+                        )
+                        :
+                        <View className="h-full w-full items-center justify-center">
+                            <NuText variant='regular' className='text-2xl text-neutral-500'>Loading...</NuText>
+                        </View>
+                }
             </View>
             {filters.map((filter) =>
                 filter.id === 'date' ? (

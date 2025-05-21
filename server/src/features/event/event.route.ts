@@ -1,12 +1,8 @@
 import { Router } from "express";
 import * as eventController from "./event.controller";
 import authenticateToken from "../../middleware/authMiddleware";
-import { event } from ".";
 
 const router = Router();
-
-// Event Types
-router.get("/types", eventController.getEventTypes);
 
 // Event CRUD
 router.post("/", authenticateToken, eventController.createEvent);
@@ -26,6 +22,9 @@ router.get("/:id", eventController.getEventById);
 
 router.put("/:id", authenticateToken, eventController.updateEvent);
 router.delete("/:id", authenticateToken, eventController.deleteEvent);
+
+router.delete("/:eventId/attendance/:userId", authenticateToken, eventController.cancelAttendance);
+
 
 
 export default router;

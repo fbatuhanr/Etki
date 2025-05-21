@@ -62,7 +62,6 @@ export const useFriend = () => {
     }
   };
 
-
   const getIncomingRequests = async () => {
     try {
       setOnProgress(true);
@@ -142,6 +141,14 @@ export const useFriend = () => {
     }
   };
 
+  const cleanUpAcceptedRequests = async () => {
+    try {
+      await axiosInstance.post("/friend/cleanup");
+    } catch (err) {
+      // console.warn("Cleanup failed:", err);
+    }
+  };
+
   return {
     onProgress,
     sendFriendRequest,
@@ -153,6 +160,7 @@ export const useFriend = () => {
     getFriendsOfUser,
     checkIsFriend,
     checkHasPendingRequest,
-    removeFriend
+    removeFriend,
+    cleanUpAcceptedRequests
   };
 };

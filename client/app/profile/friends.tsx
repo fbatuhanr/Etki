@@ -5,7 +5,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Animated, { FadeInUp } from 'react-native-reanimated';
-
 import NuText from '@/src/components/NuText';
 import { SearchIcon } from '@/src/components/Vectors';
 import { imageBlurHash } from '@/src/constants/images';
@@ -37,6 +36,7 @@ const Friends = () => {
         cancelFriendRequestByUser,
         acceptFriendRequestByUser,
         rejectFriendRequestByUser,
+        cleanUpAcceptedRequests
     } = useFriend();
 
     const [friends, setFriends] = useState<Friend[]>([]);
@@ -44,22 +44,21 @@ const Friends = () => {
     const [sentRequests, setSentRequests] = useState<SentFriendRequestWithUser[]>([]);
 
     const fetchData = async () => {
+        await cleanUpAcceptedRequests();
         const [friends, incomingRequests, sentRequests] = await Promise.all([
             getFriendsOfUser(decodedToken.userId),
             getIncomingRequests(),
             getSentRequests(),
         ]);
-        console.log('friends', friends);
-        console.log('incomingRequests', incomingRequests);
-        console.log('sentRequests', sentRequests);
         setFriends(friends);
         setIncomingRequests(incomingRequests);
         setSentRequests(sentRequests);
+        console.log('sentRequests', sentRequests);
     };
 
     useFocusEffect(
         useCallback(() => {
-        fetchData();
+            fetchData();
         }, [])
     );
 
@@ -275,23 +274,25 @@ const Friends = () => {
                                 entering={FadeInUp.delay(50)}
                                 className="w-full h-24 bg-primary rounded p-4 flex flex-row justify-between items-center shadow"
                             >
-                                <Link href={`/profile/${friend._id}`}>
-                                    <View className="w-16 h-16 rounded-full overflow-hidden">
-                                        <Image
-                                            source={friend.photo || defaultUserCover}
-                                            contentFit="cover"
-                                            transition={500}
-                                            placeholder={{ blurhash: imageBlurHash }}
-                                            style={{ width: '100%', height: '100%' }}
-                                        />
-                                    </View>
-                                </Link>
-                                <Link href={`/profile/${friend._id}`}>
-                                    <View>
-                                        <NuText variant="bold" className="text-2xl text-white">{`${friend.name} ${friend.surname}`}</NuText>
-                                        <NuText variant="regular" className="text-white">@{friend.username}</NuText>
-                                    </View>
-                                </Link>
+                                <View className="flex-row items-center gap-x-4">
+                                    <Link href={`/profile/${friend._id}`}>
+                                        <View className="w-16 h-16 rounded-full overflow-hidden">
+                                            <Image
+                                                source={friend.photo || defaultUserCover}
+                                                contentFit="cover"
+                                                transition={500}
+                                                placeholder={{ blurhash: imageBlurHash }}
+                                                style={{ width: '100%', height: '100%' }}
+                                            />
+                                        </View>
+                                    </Link>
+                                    <Link href={`/profile/${friend._id}`}>
+                                        <View>
+                                            <NuText variant="bold" className="text-2xl text-white">{`${friend.name} ${friend.surname}`}</NuText>
+                                            <NuText variant="regular" className="text-white">@{friend.username}</NuText>
+                                        </View>
+                                    </Link>
+                                </View>
                                 <TouchableOpacity onPress={() => handleRemoveFriend(friend._id)} disabled={onProgress} className="bg-primaryActive justify-between items-center rounded p-2">
                                     <AntDesign name="deleteuser" size={24} color="white" />
                                     <NuText variant="bold" className="text-white">Unfriend</NuText>

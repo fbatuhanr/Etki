@@ -7,7 +7,6 @@ import NuText from '@/src/components/NuText';
 import NuLink from '@/src/components/NuLink';
 import COLORS from '@/src/constants/colors';
 import { Toast } from 'toastify-react-native';
-import { errorMessages } from '@/src/constants/messages';
 import { useRouter } from 'expo-router';
 
 type FormData = {

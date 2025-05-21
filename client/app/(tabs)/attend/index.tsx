@@ -1,18 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { useFocusEffect } from '@react-navigation/native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  Easing,
-} from 'react-native-reanimated';
-
-import EventCard from '@/src/components/EventCard';
+import EventCard from '@/src/components/event/EventCard';
 import NuText from '@/src/components/NuText';
 import NuLink from '@/src/components/NuLink';
-import EventType from '@/src/components/EventType';
+import EventType from '@/src/components/event/EventType';
 import { useEvent } from '@/src/hooks/event/useEvent';
 import { useEventTypes } from '@/src/hooks/event/useEventTypes';
 import { Event } from '@/src/types/event';
@@ -33,17 +26,11 @@ const Attend = () => {
   const newestEvents = [...events].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   const mostPopularEvents = [...events].sort((a, b) => (b.participants?.length || 0) - (a.participants?.length || 0));
 
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(20);
-  const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value, transform: [{ translateY: translateY.value }] }));
-
   const fetchData = async () => {
     try {
       setIsLoading(true);
       const [events] = await Promise.all([getAllEvents(), getEventTypes()]);
       setEvents(events);
-      opacity.value = withTiming(1, { duration: 500, easing: Easing.out(Easing.ease) });
-      translateY.value = withTiming(0, { duration: 500, easing: Easing.out(Easing.ease) });
     } catch (err: unknown) {
       setIsError(true);
       const errorMessage = err instanceof Error ? err.message : errorMessages.default;
@@ -55,8 +42,6 @@ const Attend = () => {
   };
   useFocusEffect(
     useCallback(() => {
-      opacity.value = 0;
-      translateY.value = 40;
       fetchData();
     }, [])
   );
@@ -76,7 +61,7 @@ const Attend = () => {
     );
 
   return (
-    <Animated.View style={animatedStyle}>
+    <View>
       <View className='mt-8'>
         <View className='mb-2 mr-6 flex-row justify-between'>
           <NuText variant='extraBold' className='text-4xl'>Event Types</NuText>
@@ -132,7 +117,7 @@ const Attend = () => {
           className='pt-1 pl-2 -ml-2 pb-3 pr-4'
         />
       </View>
-    </Animated.View>
+    </View>
   );
 };
 

@@ -8,13 +8,11 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import StoreProvider from '@/src/providers/StoreProvider';
 import ToastManager from 'toastify-react-native'
-
-import '../global.css';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AntDesign from '@expo/vector-icons/AntDesign';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BackIcon } from '@/src/components/Vectors';
 import NuText from '@/src/components/NuText';
+import '../global.css';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -94,6 +92,36 @@ export default function RootLayout() {
                     <TouchableOpacity onPress={() => navigation.goBack()} className='flex-row items-center gap-x-4'>
                       <BackIcon width={24} height={24} />
                       <NuText variant='bold' className='text-2xl text-white'>Back</NuText>
+                    </TouchableOpacity>
+                  </SafeAreaView>
+                </LinearGradient>
+              )
+            }}
+          />
+          <Stack.Screen name="attenders/[id]"
+            options={{
+              headerTransparent: true,
+              header: ({ navigation }) => (
+                <LinearGradient colors={['rgba(0, 0, 0, 0.9)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0)']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
+                  <SafeAreaView className='flex-row ps-6 pe-8 justify-between'>
+                    <TouchableOpacity onPress={() => navigation.goBack()} className='flex-row items-center gap-x-4'>
+                      <BackIcon width={24} height={24} />
+                      <NuText variant='bold' className='text-2xl text-white'>Back to Event</NuText>
+                    </TouchableOpacity>
+                  </SafeAreaView>
+                </LinearGradient>
+              )
+            }}
+          />
+          <Stack.Screen name="message-center"
+            options={{
+              headerTransparent: true,
+              header: ({ navigation }) => (
+                <LinearGradient colors={['rgba(0, 0, 0, 0.9)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0)']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
+                  <SafeAreaView className='flex-row ps-6 pe-8 justify-between'>
+                    <TouchableOpacity onPress={() => navigation.goBack()} className='flex-row items-center gap-x-4'>
+                      <BackIcon width={24} height={24} />
+                      <NuText variant='bold' className='text-2xl text-white'>Go Back</NuText>
                     </TouchableOpacity>
                   </SafeAreaView>
                 </LinearGradient>

@@ -1,11 +1,11 @@
 import React from 'react';
 import { Image } from 'expo-image';
 import { View } from 'react-native'
-import NuText from './NuText'
+import NuText from '@/src/components/NuText'
 import { Link } from 'expo-router';
-import { cn } from '../lib/utils';
-import { imageBlurHash } from '../constants/images';
-import { EventType as IEventType } from '../types/event-type';
+import { cn } from '@/src/lib/utils';
+import { imageBlurHash } from '@/src/constants/images';
+import { EventType as IEventType } from '@/src/types/event-type';
 
 type EventTypeProps = IEventType & { extraClass?: string }
 const EventType: React.FC<EventTypeProps> = ({ _id, title, cover, extraClass }) => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, TextProps } from 'react-native';
-import { FONTS } from '../constants/fonts';
+import { FONTS } from '@/src/constants/fonts';
 
 interface NuTextProps extends TextProps {
     children: React.ReactNode;

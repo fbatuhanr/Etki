@@ -4,6 +4,7 @@ import { Event } from "@/src/types/event";
 import { AxiosError } from "axios";
 import { ApiErrorProps } from "@/src/types/api-error";
 import { errorMessages } from "@/src/constants/messages";
+import { Toast } from "toastify-react-native";
 
 export const useEvent = () => {
   const axiosInstance = useAxios();
@@ -77,6 +78,18 @@ export const useEvent = () => {
     }
   };
 
+  const removeParticipantFromEvent = async (eventId: string, userId: string) => {
+    try {
+      await axiosInstance.delete(`/event/${eventId}/attendance/${userId}`);
+      Toast.success("User removed.");
+      return true;
+    } catch (err) {
+      console.error("Remove error", err);
+      Toast.error("Could not remove user.");
+      return false;
+    }
+  };
+
   return {
     getAllEvents,
     getEventById,
@@ -84,6 +97,7 @@ export const useEvent = () => {
     getJoinedEvents,
     getFavoritedEvents,
     filterEvents,
-    createEvent
+    createEvent,
+    removeParticipantFromEvent
   };
 };

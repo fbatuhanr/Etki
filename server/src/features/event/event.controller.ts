@@ -73,15 +73,6 @@ export async function getEventById(req: Request, res: Response, next: NextFuncti
   }
 };
 
-export async function getEventTypes(_req: Request, res: Response, next: NextFunction): Promise<void> {
-  try {
-    const types = await eventService.getEventTypes();
-    res.status(200).json({ message: "Event types fetched successfully", data: types });
-  } catch (error) {
-    next(error);
-  }
-};
-
 export async function filterEvents(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { filters, query } = req.query;
@@ -148,6 +139,15 @@ export async function removeEventFavorite(req: CustomRequest, res: Response, nex
     const eventId = req.params.eventId;
     await eventService.removeEventFavorite(userId, eventId);
     res.status(200).json({ message: "Removed from favorites" });
+  } catch (err) {
+    next(err);
+  }
+}
+export async function cancelAttendance(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { eventId, userId } = req.params;
+    await eventService.cancelAttendance(eventId, userId);
+    res.status(200).json({ message: "Attendance cancelled." });
   } catch (err) {
     next(err);
   }

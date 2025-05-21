@@ -1,3 +1,4 @@
+import { MessageCount } from "./message";
 import { Participant } from "./participant";
 
 export type Event = {
@@ -21,10 +22,11 @@ export type Event = {
     participants: Participant[];
     creator: {
         _id: string;
-        fullName: string;
-        email?: string;
-        avatar?: string;
-    };
+        username: string;
+        name: string;
+        surname: string;
+        photo?: string;
+    }
     createdAt: Date;
     updatedAt: Date;
 };
@@ -46,3 +48,11 @@ export type EventCard = Pick<
 >;
 
 export type EventCardHistory = Pick<Event, "_id" | "title" | "cover" | "date">;
+
+export type EventChat = {
+    _id: string;
+    title: string;
+    eventId: string;
+    cover: string;
+    date: Date;
+} & MessageCount;

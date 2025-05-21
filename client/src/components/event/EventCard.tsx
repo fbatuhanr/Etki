@@ -3,13 +3,13 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { DateBackground, LocationIcon, FavIcon, LineIcon } from '@/src/components/Vectors';
 import NuText from '@/src/components/NuText';
-import { Link, router } from 'expo-router';
+import { Link } from 'expo-router';
 import { formatDate } from '@/src/utils/dateUtils';
 import { EventCard as IEventCard } from '@/src/types/event';
 import { imageBlurHash } from '@/src/constants/images';
-import { cn } from '../lib/utils';
-import { defaultUserCover } from '../data/defaultValues';
-import { useEventFavorite } from '../hooks/event/useEventFavorite';
+import { cn } from '@/src/lib/utils';
+import { defaultUserCover } from '@/src/data/defaultValues';
+import { useEventFavorite } from '@/src/hooks/event/useEventFavorite';
 
 const EventCard: React.FC<IEventCard> = ({
     _id,

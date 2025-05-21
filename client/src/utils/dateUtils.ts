@@ -1,4 +1,4 @@
-import { SelectionType } from "../components/CalendarModal";
+import { SelectionType } from "../components/modal/CalendarModal";
 
 export const dateFormatter = (date?: Date): string => date?.toLocaleDateString() || '';
 
@@ -99,10 +99,29 @@ export const isDateLabelCustom = (label?: string): boolean => {
 
 export const formatDate = (date: Date): string => {
     if (!date) return '';
-    const day = date.getDate().toString().padStart(2, '0'); // '30'
-    const month = date.toLocaleString('en-US', { month: 'long' }).toUpperCase(); // 'DECEMBER'
-    const hours = date.getHours().toString().padStart(2, '0'); // '18'
-    const minutes = date.getMinutes().toString().padStart(2, '0'); // '00'
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = date.toLocaleString('en-US', { month: 'long' }).toUpperCase();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
 
-    return `${day} ${month} ${hours}:${minutes}`; // '30 DECEMBER 18:00'
+    return `${day} ${month} ${hours}:${minutes}`; // 30 DECEMBER 18:00
 };
+
+export function formatToDayAndTimePeriod(date: Date): string {
+    const days = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+    const hours = date.getHours();
+
+    let timePeriod = "";
+    if (hours >= 5 && hours < 12) {
+        timePeriod = "MORNING";
+    } else if (hours >= 12 && hours < 17) {
+        timePeriod = "AFTERNOON";
+    } else if (hours >= 17 && hours < 21) {
+        timePeriod = "EVENING";
+    } else {
+        timePeriod = "NIGHT";
+    }
+
+    const dayName = days[date.getDay()];
+    return `${dayName} ${timePeriod}`;  // SUNDAY EVENING
+}

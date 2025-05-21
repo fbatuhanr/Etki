@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { SafeAreaView, TouchableOpacity, Modal, View, TouchableWithoutFeedback, Platform, StyleSheet } from 'react-native'
+import React, { useState } from 'react'
+import { SafeAreaView, TouchableOpacity, Modal, View, TouchableWithoutFeedback } from 'react-native'
 import { router } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import NuText from './NuText';
-import { BackIcon, CalendarIcon, UpArrowIcon } from './Vectors';
+import NuText from '@/src/components/NuText';
+import { BackIcon, CalendarIcon } from '@/src/components/Vectors';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { dateFormatter, getDateRange, getDayName, isDateLabelCustom, isToday, isTomorrow } from '../utils/dateUtils';
-import COLORS from '../constants/colors';
+import { dateFormatter, getDateRange, isDateLabelCustom } from '@/src/utils/dateUtils';
 
 type CalendarModalProps = {
     visible: boolean;

@@ -10,7 +10,7 @@ import { LogoMultipleRing, SearchIcon, CalendarIcon, BackIcon } from '@/src/comp
 // import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
 
 import { COLORS } from '@/src/constants/colors';
-import CalendarModal from '@/src/components/CalendarModal';
+import CalendarModal from '@/src/components/modal/CalendarModal';
 
 const AttendLayout = () => {
 
@@ -23,13 +23,7 @@ const AttendLayout = () => {
         }
     }, [search.isEnabled]);
 
-
     const [calendar, setCalendar] = useState({ isModalVisible: false, value: '' });
-    useEffect(() => {
-        if (!calendar.value) return;
-
-        // alert(`value changed: ${calendar.value}`);
-    }, [calendar.value])
 
     return (
         <SafeAreaView edges={['top']}>

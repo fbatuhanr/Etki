@@ -1,15 +1,15 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { Link, router, Stack, useLocalSearchParams } from 'expo-router';
 import { View, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Sharing from 'expo-sharing';
 import { BackIcon, DateDetailBackground, FavIcon, LineIcon, LocationDetailIcon, ParticipantsIcon, ShareIcon, TimerIcon, WarningIcon } from '@/src/components/Vectors';
 import NuText from '@/src/components/NuText';
+import NuLink from '@/src/components/NuLink';
 import { useCallback, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { ScrollView } from 'react-native-gesture-handler';
-import { useGet } from '@/src/hooks/common/useGet';
-import { formatDate } from '@/src/utils/dateUtils';
+import { formatDate, formatToDayAndTimePeriod } from '@/src/utils/dateUtils';
 import { Event } from '@/src/types/event';
 import { useDecodedToken } from '@/src/hooks/common/useDecodedToken';
 import { imageBlurHash } from '@/src/constants/images';
@@ -19,34 +19,40 @@ import { useEvent } from '@/src/hooks/event/useEvent';
 import useAxios from '@/src/hooks/common/useAxios';
 import { errorMessages, successMessages } from '@/src/constants/messages';
 import { Toast } from 'toastify-react-native';
-import { set } from 'react-hook-form';
 import { useEventFavorite } from '@/src/hooks/event/useEventFavorite';
+import { set } from 'react-hook-form';
 
 const EventDetail = () => {
     const { id } = useLocalSearchParams();
+    const eventId = id as string;
     const decodedToken = useDecodedToken();
     const axiosInstance = useAxios();
 
     const [onProgress, setOnProgress] = useState(false);
-    const { isFavorited, onProgress: favoriteOnProgress, handleFavorite } = useEventFavorite(id as string);
+    const { isFavorited, onProgress: favoriteOnProgress, handleFavorite } = useEventFavorite(eventId);
 
     const { getEventById } = useEvent();
     const [event, setEvent] = useState<Event | null>(null);
-    const { title, description, quota, type, location, date, isLimitedTime, isOnline, isPrivate, isFree, cover, participants, creator } = event || {};
+    const { title, description, quota, type, location, date, isLimitedTime, isOnline, isPrivate, isFree, cover, participants, creator, createdAt, updatedAt } = event || {};
+    const [loading, setLoading] = useState(true);
 
     const dateParts = formatDate(new Date(date ?? "")).split(" ");
-    const remainingSlots = Number(quota) - (participants?.length ?? 0) + 1;
-    const quotaWithOwner = Number(quota) + 1;
+    const remainingSlots = Number(quota) - (participants?.length ?? 0);
+    const quotaWithOwner = Number(quota);
 
     const isUserEventOwner = creator?._id === decodedToken?.userId;
     const isUserParticipant = participants?.some((participant) => participant._id === decodedToken?.userId);
     const editEventLink = `/event/edit-event/${id}` as const;
 
+    const fetchData = async () => {
+        setLoading(true);
+        const result = await getEventById(eventId)
+        setEvent(result);
+        setLoading(false);
+    };
     useFocusEffect(
         useCallback(() => {
-            const fetchData = async () => {
-                setEvent(await getEventById(id as string));
-            };
+            if (!eventId) return;
             fetchData();
         }, [])
     );
@@ -69,6 +75,7 @@ const EventDetail = () => {
         }
         finally {
             setOnProgress(false);
+            fetchData();
         }
     };
 
@@ -85,6 +92,7 @@ const EventDetail = () => {
         }
         finally {
             setOnProgress(false);
+            fetchData();
         }
     };
 
@@ -135,17 +143,20 @@ const EventDetail = () => {
                     />
                     <View className='absolute bottom-0 items-center'>
                         <DateDetailBackground width={316} height={54} />
-                        <View className='absolute bottom-1.5 flex-row items-center gap-x-0.5'>
-                            <NuText variant='bold' className='text-whitish text-3xl'>{dateParts[0]}</NuText>
-                            <NuText variant='semiBold' className='text-whitish text-2xl mx-1'>{dateParts[1]}</NuText>
-                            <NuText variant='bold' className='text-whitish text-2xl'>2024</NuText>
-                            <View className='rotate-[-90deg] mt-1.5 -mx-3'><LineIcon width={48} height={8} /></View>
-                            <NuText variant='bold' className='text-whitish text-3xl'>{dateParts[2]}</NuText>
-                        </View>
+                        {
+                            !loading &&
+                            <View className='absolute bottom-1.5 flex-row items-center gap-x-0.5'>
+                                <NuText variant='bold' className='text-whitish text-3xl'>{dateParts[0]}</NuText>
+                                <NuText variant='semiBold' className='text-whitish text-2xl mx-1'>{dateParts[1]}</NuText>
+                                <NuText variant='bold' className='text-whitish text-2xl'>2024</NuText>
+                                <View className='rotate-[-90deg] mt-1.5 -mx-3'><LineIcon width={48} height={8} /></View>
+                                <NuText variant='bold' className='text-whitish text-3xl'>{dateParts[2]}</NuText>
+                            </View>
+                        }
                     </View>
                 </View>
                 <View className='p-4'>
-                    <NuText variant='medium' className='text-base'>{type?.title}</NuText>
+                    <NuLink variant='medium' className='text-base' href={`/filters?type=${type?._id}`}>{type?.title}</NuLink>
                     <NuText variant='bold' className='text-2xl mt-2 mb-4'>{title}</NuText>
                     <View className='bg-greeyish p-4 rounded-lg'>
                         <NuText className='text-base mb-2'>{description}</NuText>
@@ -155,16 +166,18 @@ const EventDetail = () => {
                             <View className='h-10 w-10 bg-primary rounded-full items-center justify-center'>
                                 <TimerIcon width={24} height={24} />
                             </View>
-                            <NuText variant='medium' className='text-lg'>MONDAY EVENING</NuText>
+                            <NuText variant='medium' className='text-lg'>{formatToDayAndTimePeriod(new Date(date || ''))}</NuText>
                         </View>
                         <View className='flex-row items-center gap-x-4'>
                             <View className='h-10 w-10 bg-primary rounded-full items-center justify-center'>
                                 <ParticipantsIcon width={24} height={24} />
                             </View>
-                            <View className='flex-row gap-x-2 items-centeer'>
-                                <NuText variant='medium' className='text-lg'>{quotaWithOwner} PEOPLE</NuText>
-                                <NuText variant='medium' className='text-base text-secondary'>({remainingSlots} LEFT)</NuText>
-                            </View>
+                            <Link href={`/attenders/${id}`}>
+                                <View className='flex-row gap-x-2 items-center'>
+                                    <NuText variant='medium' className='text-lg text-primary border-b border-primary'>{quotaWithOwner} PEOPLE</NuText>
+                                    <NuText variant='medium' className='text-base text-secondary'>({remainingSlots} LEFT)</NuText>
+                                </View>
+                            </Link>
                         </View>
                         <View className='flex-row items-center gap-x-4'>
                             <View className='h-10 w-10 bg-primary rounded-full items-center justify-center'>
@@ -196,31 +209,51 @@ const EventDetail = () => {
                             </View>
                         )}
                     </View>
-
                     <View className='mt-6'>
                         <NuText variant='bold' className='text-xl'>RULES</NuText>
                         <View className='mt-3 gap-y-1'>
                             <View className='bg-greeyish flex-row items-center gap-x-2 px-4 py-2 rounded-lg'>
                                 <WarningIcon width={24} height={24} />
-                                <NuText variant='bold'>Mauris a leo magna.</NuText>
+                                <NuText variant='bold'>You can leave the event anytime before it starts.</NuText>
                             </View>
                             <View className='bg-greeyish flex-row items-center gap-x-2 px-4 py-2 rounded-lg'>
                                 <WarningIcon width={24} height={24} />
-                                <NuText variant='bold'>Aenean nisl diam pulvinar ultrices.</NuText>
+                                <NuText variant='bold'>You can't join if the participant limit is full.</NuText>
                             </View>
                             <View className='bg-greeyish flex-row items-center gap-x-2 px-4 py-2 rounded-lg'>
                                 <WarningIcon width={24} height={24} />
-                                <NuText variant='bold'>Mauris a leo magna.</NuText>
+                                <NuText variant='bold'>Only logged-in users can join events.</NuText>
+                            </View>
+                            <View className='bg-greeyish flex-row items-center gap-x-2 px-4 py-2 rounded-lg'>
+                                <WarningIcon width={24} height={24} />
+                                <NuText variant='bold'>The organizer can approve or cancel participation.</NuText>
+                            </View>
+                            <View className='bg-greeyish flex-row items-center gap-x-2 pl-4 pr-12 py-2 rounded-lg'>
+                                <WarningIcon width={24} height={24} />
+                                <NuText variant='bold'>Participants who break the rules may be removed by the organizer.</NuText>
+                            </View>
+                            <View className='bg-greeyish flex-row justify-center items-center px-4 py-2 rounded-lg'>
+                                <NuText variant='mediumItalic' className='text-neutral-700 italic'>The platform owners are not responsible for any event or its content.</NuText>
                             </View>
                         </View>
+                    </View>
+                    <View className='mt-6 border-t border-neutral-300 p-4 rounded-lg'>
+                        <NuText variant='bold' className='text-lg text-neutral-900'>
+                            {`This event was created on ${formatDate(new Date(createdAt || ''))} and last updated on ${formatDate(new Date(updatedAt || ''))}.`}
+                        </NuText>
                     </View>
                 </View>
             </ScrollView>
             {
                 isUserEventOwner && (
-                    <TouchableOpacity onPress={() => router.push(editEventLink)} className='fixed bottom-0 bg-secondary h-20 items-center justify-center pb-2 rounded-[14px]'>
-                        <NuText variant='extraBold' className='text-2xl text-white'>EDIT EVENT</NuText>
-                    </TouchableOpacity>
+                    <View className='fixed bottom-0'>
+                        <TouchableOpacity onPress={() => router.push(editEventLink)} className='bg-secondary h-16 items-center justify-center rounded-t-3xl'>
+                            <NuText variant='extraBold' className='text-2xl text-white'>EDIT EVENT</NuText>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => router.push(`/attenders/${id}`)} className='bg-primary h-20 items-center justify-center pb-2'>
+                            <NuText variant='extraBold' className='text-2xl text-white'>VIEW ATTENDEES</NuText>
+                        </TouchableOpacity>
+                    </View>
                 )
             }
             {

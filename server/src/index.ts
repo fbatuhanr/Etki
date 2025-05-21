@@ -11,6 +11,8 @@ import { initializeSocket } from "./socket";
 import { user } from "./features/user";
 import { friend } from "./features/friend";
 import { event } from "./features/event";
+import { eventType } from "./features/event-type";
+import { message } from "./features/message";
 import { auth } from "./features/auth";
 import errorHandler from "./middleware/errorHandler";
 
@@ -29,7 +31,12 @@ const port = process.env.PORT || 3001;
 };*/
 
 // app.use(cors(corsOptions));
-app.use(cors());
+const corsOptions = {
+  origin: "http://localhost:8081", // veya Expo web client hangi porttaysa
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
@@ -48,5 +55,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/user", user);
 app.use("/friend", friend);
 app.use("/event", event);
+app.use("/event-type", eventType);
+app.use("/message", message);
 app.use("/auth", auth);
 app.use(errorHandler);

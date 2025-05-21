@@ -1,16 +1,16 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { DateBackground, LocationIcon, FavIcon, LineIcon } from './Vectors';
-import NuText from '../components/NuText';
+import { DateBackground, LocationIcon, FavIcon, LineIcon } from '@/src/components/Vectors';
+import NuText from '@/src/components/NuText';
 import { Link } from 'expo-router';
-import { Event } from '../types/event';
-import { formatDate } from '../utils/dateUtils';
-import { defaultUserCover } from '../data/defaultValues';
-import { cn } from '../lib/utils';
+import { Event } from '@/src/types/event';
+import { formatDate } from '@/src/utils/dateUtils';
+import { defaultUserCover } from '@/src/data/defaultValues';
+import { cn } from '@/src/lib/utils';
 import { Image } from 'expo-image';
-import { imageBlurHash } from '../constants/images';
-import { clipText } from '../utils/textUtils';
-import { useEventFavorite } from '../hooks/event/useEventFavorite';
+import { imageBlurHash } from '@/src/constants/images';
+import { clipText } from '@/src/utils/textUtils';
+import { useEventFavorite } from '@/src/hooks/event/useEventFavorite';
 
 const EventCardWide: React.FC<Event> = ({
     _id,

@@ -1,32 +1,29 @@
 import React, { useCallback, useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import Entypo from '@expo/vector-icons/Entypo';
-import AntDesign from '@expo/vector-icons/AntDesign';
 import NuText from '@/src/components/NuText';
 import { defaultUserCover } from '@/src/data/defaultValues';
 import { ParticipantsIcon } from '@/src/components/Vectors';
-import { Link, router, useLocalSearchParams } from 'expo-router';
-import { TouchableWithoutFeedback } from 'react-native';
-import COLORS from '@/src/constants/colors';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Toast } from 'toastify-react-native';
-import { errorMessages, successMessages } from '@/src/constants/messages';
+import { errorMessages } from '@/src/constants/messages';
 import { useUser } from '@/src/hooks/user/useUser';
-import { useDecodedToken } from '@/src/hooks/common/useDecodedToken';
 import { Image } from 'expo-image';
 import { imageBlurHash } from '@/src/constants/images';
 import { Event } from '@/src/types/event';
-import { useGet } from '@/src/hooks/common/useGet';
 import { useEvent } from '@/src/hooks/event/useEvent';
 import { FlatList, ScrollView } from 'react-native-gesture-handler';
 import { User } from '@/src/types/user';
-import EventCardHistory from '@/src/components/EventCardHistory';
+import EventCardHistory from '@/src/components/event/EventCardHistory';
 import { useFriend } from '@/src/hooks/friend/useFriend';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useDecodedToken } from '@/src/hooks/common/useDecodedToken';
 
 const ViewProfile = () => {
     const { id } = useLocalSearchParams();
     const profileId = Array.isArray(id) ? id[0] : id ?? '';
+    const decodedToken = useDecodedToken();
+    const isCurrentUser = decodedToken?.userId === profileId;
 
     const { getUserById } = useUser();
     const [user, setUser] = useState<User | null>(null);
@@ -164,7 +161,7 @@ const ViewProfile = () => {
                                         <ParticipantsIcon width={24} height={24} />
                                     </View>
                                     <View className='flex-row gap-x-2'>
-                                        <NuText variant='bold' className='text-xl text-primary'>0</NuText>
+                                        <NuText variant='bold' className='text-xl text-primary'>{user?.friends.length}</NuText>
                                         <NuText variant='medium' className='text-xl'>Friends</NuText>
                                     </View>
                                 </View>
@@ -173,14 +170,14 @@ const ViewProfile = () => {
                                 <View className='h-10 w-10 bg-primary rounded-full items-center justify-center'>
                                     <View className='h-8 w-8 bg-whitish rounded-full' />
                                 </View>
-                                <NuText variant='bold' className='text-xl text-primary'>0</NuText>
+                                <NuText variant='bold' className='text-xl text-primary'>{joinedEvents.length}</NuText>
                                 <NuText variant='medium' className='text-xl'>Event Attends</NuText>
                             </View>
                             <View className='flex-row items-center gap-x-2'>
                                 <View className='h-10 w-10 bg-primary rounded-full items-center justify-center'>
                                     <View className='h-8 w-8 bg-whitish rounded-full' />
                                 </View>
-                                <NuText variant='bold' className='text-xl text-primary'>0</NuText>
+                                <NuText variant='bold' className='text-xl text-primary'>{createdEvents.length}</NuText>
                                 <NuText variant='medium' className='text-xl'>Events Created</NuText>
                             </View>
                         </View>
@@ -196,106 +193,122 @@ const ViewProfile = () => {
                     </View>
                     <View>
                         <NuText variant='bold' className='text-3xl mb-2 border-b border-neutral-200 pb-1'>Event History</NuText>
-                        <View className='mt-2 gap-y-4'>
-                            <View>
-                                <NuText variant='medium' className='text-2xl mb-2 ml-2'>Joined Events</NuText>
-                                {
-                                    joinedEvents.length > 0 ?
-                                        <FlatList
-                                            data={joinedEvents}
-                                            renderItem={({ item }) => <EventCardHistory {...item} />}
-                                            keyExtractor={(item) => item._id}
-                                            horizontal
-                                            showsHorizontalScrollIndicator={false}
-                                            className='-mr-6'
-                                        />
-                                        :
-                                        <View className='h-40 items-center justify-center'>
-                                            <NuText variant='medium' className='text-xl text-center text-blackish'>
-                                                No joined events yet...
-                                            </NuText>
-                                        </View>
-                                }
-                            </View>
-                            {
-                                <View className='border-b border-t border-neutral-200 pt-2 pb-6'>
-                                    <NuText variant='medium' className='text-2xl mb-2 ml-2'>Favorite Events</NuText>
+                        {
+                            user?.isPublic || isFriend ?
+                                <View className='mt-2 gap-y-4'>
+                                    <View>
+                                        <NuText variant='medium' className='text-2xl mb-2 ml-2'>Joined Events</NuText>
+                                        {
+                                            joinedEvents.length > 0 ?
+                                                <FlatList
+                                                    data={joinedEvents}
+                                                    renderItem={({ item }) => <EventCardHistory {...item} />}
+                                                    keyExtractor={(item) => item._id}
+                                                    horizontal
+                                                    showsHorizontalScrollIndicator={false}
+                                                    className='-mr-6'
+                                                />
+                                                :
+                                                <View className='h-40 items-center justify-center'>
+                                                    <NuText variant='medium' className='text-xl text-center text-blackish'>
+                                                        No joined events yet...
+                                                    </NuText>
+                                                </View>
+                                        }
+                                    </View>
                                     {
-                                        favoriteEvents.length > 0 ?
-                                            <FlatList
-                                                data={favoriteEvents}
-                                                renderItem={({ item }) => <EventCardHistory {...item} />}
-                                                keyExtractor={(item) => item._id}
-                                                horizontal
-                                                showsHorizontalScrollIndicator={false}
-                                                className='-mr-6'
-                                            />
-                                            :
-                                            <View className='h-40 items-center justify-center'>
-                                                <NuText variant='medium' className='text-xl text-center text-blackish'>
-                                                    No favorite events yet...
-                                                </NuText>
-                                            </View>
-                                    }
-                                </View>
-                            }
-                            <View>
-                                <NuText variant='medium' className='text-2xl mb-2 ml-2'>Created Events</NuText>
-                                {
-                                    createdEvents.length > 0 ?
-                                        <FlatList
-                                            data={createdEvents}
-                                            renderItem={({ item }) => <EventCardHistory {...item} />}
-                                            keyExtractor={(item) => item._id}
-                                            horizontal
-                                            showsHorizontalScrollIndicator={false}
-                                            className='-mr-6'
-                                        />
-                                        :
-                                        <View className='h-40 items-center justify-center'>
-                                            <NuText variant='medium' className='text-xl text-center text-blackish'>
-                                                No created events yet...
-                                            </NuText>
+                                        <View className='border-b border-t border-neutral-200 pt-2 pb-6'>
+                                            <NuText variant='medium' className='text-2xl mb-2 ml-2'>Favorite Events {`${favoriteEvents.length && `(${favoriteEvents.length})`}`}</NuText>
+                                            {
+                                                favoriteEvents.length > 0 ?
+                                                    <FlatList
+                                                        data={favoriteEvents}
+                                                        renderItem={({ item }) => <EventCardHistory {...item} />}
+                                                        keyExtractor={(item) => item._id}
+                                                        horizontal
+                                                        showsHorizontalScrollIndicator={false}
+                                                        className='-mr-6'
+                                                    />
+                                                    :
+                                                    <View className='h-40 items-center justify-center'>
+                                                        <NuText variant='medium' className='text-xl text-center text-blackish'>
+                                                            No favorite events yet...
+                                                        </NuText>
+                                                    </View>
+                                            }
                                         </View>
-                                }
-                            </View>
-                        </View>
+                                    }
+                                    <View>
+                                        <NuText variant='medium' className='text-2xl mb-2 ml-2'>Created Events</NuText>
+                                        {
+                                            createdEvents.length > 0 ?
+                                                <FlatList
+                                                    data={createdEvents}
+                                                    renderItem={({ item }) => <EventCardHistory {...item} />}
+                                                    keyExtractor={(item) => item._id}
+                                                    horizontal
+                                                    showsHorizontalScrollIndicator={false}
+                                                    className='-mr-6'
+                                                />
+                                                :
+                                                <View className='h-40 items-center justify-center'>
+                                                    <NuText variant='medium' className='text-xl text-center text-blackish'>
+                                                        No created events yet...
+                                                    </NuText>
+                                                </View>
+                                        }
+                                    </View>
+                                </View>
+                                :
+                                <View className='h-96 items-center justify-center'>
+                                    <NuText variant='medium' className='text-xl text-center text-blackish'>
+                                        This user's profile is not public.
+                                    </NuText>
+                                    <NuText variant='medium' className='text-xl text-center text-blackish'>
+                                        Send friend request to see their events.
+                                    </NuText>
+                                </View>
+                        }
                     </View>
                 </View>
             </ScrollView>
-            <View className='fixed bottom-10'>
-                {isFriend ? (
-                    <TouchableOpacity
-                        onPress={handleRemoveFriend}
-                        disabled={onProgress}
-                        className='bg-quaternary h-20 items-center justify-center pb-2 rounded-[14px]'
-                    >
-                        <NuText variant='extraBold' className='text-2xl text-white'>
-                            {!onProgress ? 'REMOVE FRIEND' : 'REMOVING...'}
-                        </NuText>
-                    </TouchableOpacity>
-                ) : hasPendingRequest ? (
-                    <TouchableOpacity
-                        onPress={handleCancelRequest}
-                        disabled={onProgress}
-                        className='bg-yellow-500 h-20 items-center justify-center pb-2 rounded-[14px]'
-                    >
-                        <NuText variant='extraBold' className='text-2xl text-white'>
-                            {!onProgress ? 'CANCEL REQUEST' : 'CANCELLING...'}
-                        </NuText>
-                    </TouchableOpacity>
-                ) : (
-                    <TouchableOpacity
-                        onPress={handleSendRequest}
-                        disabled={onProgress}
-                        className='bg-primary h-20 items-center justify-center pb-2 rounded-[14px]'
-                    >
-                        <NuText variant='extraBold' className='text-2xl text-white'>
-                            {!onProgress ? 'SEND FRIEND REQUEST' : 'SENDING...'}
-                        </NuText>
-                    </TouchableOpacity>
-                )}
-            </View>
+            {
+                !isCurrentUser &&
+                <View className='fixed bottom-10'>
+                    {isFriend ? (
+                        <TouchableOpacity
+                            onPress={handleRemoveFriend}
+                            disabled={onProgress}
+                            className='bg-quaternary h-20 items-center justify-center pb-2 rounded-[14px]'
+                        >
+                            <NuText variant='extraBold' className='text-2xl text-white'>
+                                {!onProgress ? 'REMOVE FRIEND' : 'REMOVING...'}
+                            </NuText>
+                        </TouchableOpacity>
+                    ) : hasPendingRequest ? (
+                        <TouchableOpacity
+                            onPress={handleCancelRequest}
+                            disabled={onProgress}
+                            className='bg-yellow-500 h-20 items-center justify-center pb-2 rounded-[14px]'
+                        >
+                            <NuText variant='extraBold' className='text-2xl text-white'>
+                                {!onProgress ? 'CANCEL REQUEST' : 'CANCELLING...'}
+                            </NuText>
+                        </TouchableOpacity>
+                    ) : (
+                        <TouchableOpacity
+                            onPress={handleSendRequest}
+                            disabled={onProgress}
+                            className='bg-primary h-20 items-center justify-center pb-2 rounded-[14px]'
+                        >
+                            <NuText variant='extraBold' className='text-2xl text-white'>
+                                {!onProgress ? 'SEND FRIEND REQUEST' : 'SENDING...'}
+                            </NuText>
+                        </TouchableOpacity>
+                    )}
+                </View>
+            }
+
         </SafeAreaView>
     )
 }

@@ -28,7 +28,7 @@ const errorHandler: ErrorRequestHandler = (err: CustomError, req: Request, res: 
   }
 
   // General server error
-  res.status(500).json({ message: `(?) ${err.message}` || "(?) Internal Server Error" });
+  res.status(500).json({ message: `${err.message}` || "Internal Server Error" });
 }
 
 export default errorHandler;

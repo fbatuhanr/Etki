@@ -1,8 +1,8 @@
 import React from "react";
-import { Modal, View, Text, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
+import { Modal, View, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import NuText from "./NuText";
-import COLORS from "../constants/colors";
+import NuText from "@/src/components/NuText";
+import COLORS from "@/src/constants/colors";
 
 type PickerModalProps = {
     visible: boolean;

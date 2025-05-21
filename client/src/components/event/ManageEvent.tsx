@@ -4,11 +4,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
 import NuText from '@/src/components/NuText';
 import { BackIcon, CalendarIcon, CreateIcon } from '@/src/components/Vectors';
-import PickerModal from '@/src/components/PickerModal';
+import PickerModal from '@/src/components/modal/PickerModal';
 import COLORS from '@/src/constants/colors';
 import { useEffect, useState } from 'react';
-import DatePickerModal from '@/src/components/DatePickerModal';
-import TimePickerModal from '@/src/components/TimePickerModal';
+import DatePickerModal from '@/src/components/modal/DatePickerModal';
+import TimePickerModal from '@/src/components/modal/TimePickerModal';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import * as ImagePicker from 'expo-image-picker';
 import { Toast } from 'toastify-react-native';
@@ -20,13 +20,13 @@ import { ApiErrorProps } from '@/src/types/api-error';
 import { cn } from '@/src/lib/utils';
 import { deleteFromFirebase, uploadImageToFirebase } from '@/src/lib/firebaseOperations';
 import { getRoundedMinute } from '@/src/utils/timeUtils';
-import { useEvent } from '../hooks/event/useEvent';
-import { useEventTypes } from '../hooks/event/useEventTypes';
-import { useDecodedToken } from '../hooks/common/useDecodedToken';
+import { useEvent } from '../../hooks/event/useEvent';
+import { useEventTypes } from '../../hooks/event/useEventTypes';
+import { useDecodedToken } from '../../hooks/common/useDecodedToken';
 import { router } from 'expo-router';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { Image } from 'expo-image';
-import { imageBlurHash } from '../constants/images';
+import { imageBlurHash } from '../../constants/images';
 
 type FormData = {
     title: string;
@@ -177,6 +177,7 @@ const ManageEvent: React.FC<ManageEventProps> = ({ id }) => {
 
             const response = await axiosInstance.post('event', payload);
             Toast.success(response.data.message || successMessages.default);
+            router.push('/(tabs)/attend');
 
         } catch (err: unknown) {
             console.error(err);

@@ -1,15 +1,15 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Image } from 'expo-image';
-import { DateBackground, LineIcon } from './Vectors';
-import NuText from '../components/NuText';
+import { DateBackground, LineIcon } from '@/src/components/Vectors';
+import NuText from '@/src/components/NuText';
 import { Link } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { clipText } from '../utils/textUtils';
-import { EventCardHistory as IEventCardHistory } from '../types/event';
-import { formatDate } from '../utils/dateUtils';
-import { imageBlurHash } from '../constants/images';
-import { cn } from '../lib/utils';
+import { clipText } from '@/src/utils/textUtils';
+import { EventCardHistory as IEventCardHistory } from '@/src/types/event';
+import { formatDate } from '@/src/utils/dateUtils';
+import { imageBlurHash } from '@/src/constants/images';
+import { cn } from '@/src/lib/utils';
 
 const EventCardHistory: React.FC<IEventCardHistory> = ({ _id, title, cover, date }) => {
     const isDatePassed = new Date(date ?? "").getTime() < Date.now();

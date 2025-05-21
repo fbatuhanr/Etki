@@ -20,11 +20,12 @@ import { ApiErrorProps } from '@/src/types/api-error';
 import { deleteFromFirebase, uploadImageToFirebase } from '@/src/lib/firebaseOperations';
 import { Image } from 'expo-image';
 import { imageBlurHash } from '@/src/constants/images';
+import { User } from '@/src/types/user';
 
 type FormData = {
     name: string;
     surname: string;
-    photo: ImagePicker.ImagePickerAsset | null;
+    photo: ImagePicker.ImagePickerAsset | string | null;
     biography: string;
     isPublic: boolean;
 };
@@ -33,7 +34,8 @@ const ProfileSettings = () => {
     const decodedToken = useDecodedToken();
     const axiosInstance = useAxios();
 
-    const { getUserById, data, loading, error } = useUser();
+    const { getUserById } = useUser();
+    const [user, setUser] = useState<User | null>(null);
 
     const [onProgress, setOnProgress] = useState(false);
 
@@ -51,21 +53,25 @@ const ProfileSettings = () => {
     const formValues = watch();
 
     useEffect(() => {
-        getUserById(decodedToken.userId as string);
+        const fetchUser = async () => {
+            const response = await getUserById(decodedToken.userId);
+            setUser(response);
+        };
+        fetchUser();
     }, [decodedToken.userId]);
 
     useEffect(() => {
-        if (data) {
+        if (user) {
             reset({
-                name: data.name || '',
-                surname: data.surname || '',
-                photo: data.photo || null,
-                biography: data.biography || '',
-                isPublic: data.isPublic ?? true
+                name: user.name || '',
+                surname: user.surname || '',
+                photo: user.photo || null,
+                biography: user.biography || '',
+                isPublic: user.isPublic ?? true
             });
-            setOldPhotoUrl(data.photo || null);
+            setOldPhotoUrl(user.photo || null);
         }
-    }, [data, reset]);
+    }, [user, reset]);
 
     const pickImage = async (onChange: (val: any) => void, fromCamera = false) => {
         try {

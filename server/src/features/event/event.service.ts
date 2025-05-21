@@ -1,7 +1,7 @@
 import mongoose, { Types, UpdateQuery } from "mongoose";
-import Event from "./event.model";
-import EventType from "./event-type.model";
 import User from "../user/user.model";
+import Event from "./event.model";
+import EventType from "../event-type/event-type.model";
 import { escapeRegex } from "../../utils/regex";
 
 export async function createEvent(data: any, userId: string) {
@@ -95,7 +95,10 @@ export async function getEventById(id: string) {
   const event = await Event.findById(id)
     .populate("typeId")
     .populate("createdBy")
-    .populate("participants")
+    .populate({
+      path: "participants",
+      select: "username name surname photo"
+    })
     .lean();
 
   if (!event) return null;
@@ -108,10 +111,6 @@ export async function getEventById(id: string) {
   };
 };
 
-export async function getEventTypes() {
-  const types = await EventType.find().sort({ title: 1 });
-  return types;
-};
 
 export async function filterEvents(filters: any[], query?: string) {
   const match: any = {};
@@ -123,9 +122,14 @@ export async function filterEvents(filters: any[], query?: string) {
 
   const dateFilter = filters.find(f => f.id === "date");
   if (dateFilter?.value?.start && dateFilter.value.end) {
+    const start = new Date(dateFilter.value.start);
+    const end = new Date(dateFilter.value.end);
+    if (start.toDateString() === end.toDateString()) {
+      end.setHours(23, 59, 59, 999);
+    }
     match.date = {
-      $gte: new Date(dateFilter.value.start),
-      $lte: new Date(dateFilter.value.end),
+      $gte: start,
+      $lte: end,
     };
   }
 
@@ -153,7 +157,7 @@ export async function filterEvents(filters: any[], query?: string) {
     { $sort: sort },
     {
       $lookup: {
-        from: "eventtypes",
+        from: "event_types",
         localField: "typeId",
         foreignField: "_id",
         as: "type",
@@ -212,4 +216,12 @@ export async function removeEventFavorite(userId: string, eventId: string) {
   if (!user) throw new Error("User not found.");
   user.favorites = user.favorites.filter((fav) => fav.toString() !== eventId);
   await user.save();
+}
+
+export async function cancelAttendance(eventId: string, userId: string) {
+  const event = await Event.findById(eventId);
+  if (!event) throw new Error("Event not found");
+
+  event.participants.pull(userId);
+  await event.save();
 }
