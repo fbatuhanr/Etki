@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { useFocusEffect } from '@react-navigation/native';
 import EventCard from '@/src/components/event/EventCard';
@@ -40,16 +40,20 @@ const Attend = () => {
       setIsLoading(false);
     }
   };
-  useFocusEffect(
-    useCallback(() => {
-      fetchData();
-    }, [])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     fetchData();
+  //   }, [])
+  // );
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   if (isLoading)
     return (
-      <View className='h-[512px] mr-6 items-center justify-center'>
-        <NuText variant='regular' className='text-2xl text-neutral-500'>Loading...</NuText>
+      <View className='h-[600px] mr-6 items-center justify-center'>
+        <ActivityIndicator size="large" />
       </View>
     );
 

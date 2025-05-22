@@ -9,24 +9,14 @@ const useAuthentication = () => {
   const dispatch = useAppDispatch();
   const axiosInstance = useAxios();
 
-  const loginCall = async (username: string, password: string): Promise<void> => {
-    try {
-      const response = await axiosInstance.post("user/login", {
-        username,
-        password,
-      });
+  const loginCall = async (username: string, password: string) => {
+    const response = await axiosInstance.post("user/login", {
+      username,
+      password,
+    });
 
-      dispatch(setAccessToken(response.data.accessToken));
-      Toast.success(response.data.message || successMessages.login);
-    } catch (error: unknown) {
-      const errorMessage =
-        isApiError(error) && error.response?.data?.message
-          ? error.response.data.message
-          : errorMessages.login;
-
-      Toast.error(errorMessage);
-      throw new Error(errorMessage);
-    }
+    dispatch(setAccessToken(response.data.accessToken));
+    return response.data.message;
   };
 
   const signupCall = async (
@@ -34,38 +24,22 @@ const useAuthentication = () => {
     username: string,
     email: string,
     password: string
-  ): Promise<void> => {
-    try {
-      const [name, surname] = fullName.trim().split(/ (?!.* )/);
-      const response = await axiosInstance.post("user/sign-up", {
-        username,
-        email,
-        password,
-        name,
-        surname,
-      });
+  ): Promise<string> => {
+    const [name, surname] = fullName.trim().split(/ (?!.* )/);
+    const response = await axiosInstance.post("user/sign-up", {
+      username,
+      email,
+      password,
+      name,
+      surname,
+    });
 
-      Toast.success(response.data.message || successMessages.signup);
-    } catch (error: unknown) {
-      const errorMessage =
-        isApiError(error) && error.response?.data?.message
-          ? error.response.data.message
-          : errorMessages.signup;
-
-      Toast.error(errorMessage);
-      throw new Error(errorMessage);
-    }
+    return response.data.message;
   };
 
   const logoutCall = async (): Promise<void> => {
-    try {
-      await axiosInstance.post("user/logout");
-      dispatch(clearAccessToken());
-      Toast.success(successMessages.logout);
-    } catch (error: unknown) {
-      // console.error("Logout Error:", error);
-      Toast.error(errorMessages.logout);
-    }
+    await axiosInstance.post("user/logout");
+    dispatch(clearAccessToken());
   };
 
   return { loginCall, signupCall, logoutCall };

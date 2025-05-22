@@ -3,7 +3,7 @@ import useAxios from "@/src/hooks/common/useAxios";
 import { Event } from "@/src/types/event";
 import { AxiosError } from "axios";
 import { ApiErrorProps } from "@/src/types/api-error";
-import { errorMessages } from "@/src/constants/messages";
+import { errorMessages, successMessages } from "@/src/constants/messages";
 import { Toast } from "toastify-react-native";
 
 export const useEvent = () => {
@@ -90,6 +90,28 @@ export const useEvent = () => {
     }
   };
 
+  const attendEvent = async (eventId: string) => {
+    try {
+      Toast.info("Joining event...");
+      const { data: responseData } = await axiosInstance.post(`/event/${eventId}/attend`);
+      Toast.success(responseData.message || successMessages.attended);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : errorMessages.attended;
+      Toast.error(message);
+    }
+  }
+
+  const leaveEvent = async (eventId: string) => {
+    try {
+      Toast.info("Leaving event...");
+      const { data: responseData } = await axiosInstance.post(`/event/${eventId}/leave`);
+      Toast.success(responseData.message || successMessages.unAttended);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : errorMessages.unAttended;
+      Toast.error(message);
+    }
+  }
+
   return {
     getAllEvents,
     getEventById,
@@ -98,6 +120,8 @@ export const useEvent = () => {
     getFavoritedEvents,
     filterEvents,
     createEvent,
-    removeParticipantFromEvent
+    removeParticipantFromEvent,
+    attendEvent,
+    leaveEvent
   };
 };

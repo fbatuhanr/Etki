@@ -8,6 +8,10 @@ import { useState } from 'react';
 import { Toast } from 'toastify-react-native';
 import useAuthentication from '@/src/hooks/common/useAuthentication';
 import { router } from 'expo-router';
+import { errorMessages, successMessages } from '@/src/constants/messages';
+import { isApiError } from '@/src/helpers/apiHelpers';
+import { AxiosError } from 'axios';
+import { ApiErrorProps } from '@/src/types/api-error';
 
 type FormData = {
   username: string;
@@ -30,14 +34,17 @@ const Login = () => {
     setIsSubmitProcessing(true);
     Toast.info("Information is being checked...");
     try {
-      await loginCall(data.username, data.password);
-      router.replace('/(tabs)/profile');
-    } catch (error) {
-      // console.error(error);
+      const message = await loginCall(data.username, data.password);
+      Toast.success(message || successMessages.login);
+      router.replace("/(tabs)/profile");
+    } catch (err: unknown) {
+      const axiosError = err as AxiosError<ApiErrorProps>;
+      Toast.error(axiosError.response?.data?.message || errorMessages.login);
     } finally {
       setIsSubmitProcessing(false);
     }
   };
+
 
   return (
     <View className='size-full justify-center gap-y-8 px-4'>

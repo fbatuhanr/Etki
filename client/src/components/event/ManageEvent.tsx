@@ -375,8 +375,10 @@ const ManageEvent: React.FC<ManageEventProps> = ({ id }) => {
                                     <PickerModal
                                         title='Quota'
                                         visible={isModalVisible.quota}
-                                        onClose={() => setIsModalVisible({ ...isModalVisible, quota: false })}
-                                        options={Object.fromEntries(Array.from({ length: 100 }, (_, i) => [`${i + 1}`, `${i + 1}`]))}
+                                        onClose={() => setIsModalVisible({ ...isModalVisible, quota: false })} 
+                                        options={Object.fromEntries(
+                                            Array.from({ length: 99 }, (_, i) => [`${i + 2}`, `${i + 2}`])
+                                        )}
                                         defaultValue="1"
                                         selectedValue={value}
                                         onValueChange={(value) => {

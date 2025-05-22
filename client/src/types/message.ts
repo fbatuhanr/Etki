@@ -17,3 +17,5 @@ export type MessageCount = {
   eventId: string;
   count: number;
 };
+
+export type MessageCountsMap = Record<string, number>;

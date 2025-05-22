@@ -174,6 +174,32 @@ export async function filterEvents(filters: any[], query?: string) {
     },
     { $unwind: "$creator" },
     {
+      $lookup: {
+        from: "users",
+        localField: "participants",
+        foreignField: "_id",
+        as: "participants",
+      },
+    },
+    {
+      $addFields: {
+        participants: {
+          $map: {
+            input: "$participants",
+            as: "p",
+            in: {
+              _id: "$$p._id",
+              username: "$$p.username",
+              name: "$$p.name",
+              surname: "$$p.surname",
+              photo: "$$p.photo",
+            },
+          },
+        },
+      },
+    },
+
+    {
       $project: {
         participantsCount: 0,
         typeId: 0,
@@ -184,6 +210,7 @@ export async function filterEvents(filters: any[], query?: string) {
 
   return events;
 };
+
 
 export async function getCreatedEventsByUser(userId: string) {
   return Event.find({ createdBy: userId }).lean();

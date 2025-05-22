@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import NuText from '@/src/components/NuText';
 import { defaultUserCover } from '@/src/data/defaultValues';
@@ -37,11 +37,11 @@ const ViewProfile = () => {
     const [joinedEvents, setJoinedEvents] = useState<Event[]>([]);
     const [favoriteEvents, setFavoriteEvents] = useState<Event[]>([]);
 
-    const [isLoading, setIsLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const fetchData = async () => {
         try {
-            setIsLoading(true);
+            setLoading(true);
             const [cEvents, jEvents, fEvents, user, isFriend, hasPendingRequest] = await Promise.all([
                 getCreatedEvents(profileId),
                 getJoinedEvents(profileId),
@@ -61,7 +61,7 @@ const ViewProfile = () => {
             Toast.error(errorMessage);
         }
         finally {
-            setIsLoading(false);
+            setLoading(false);
         }
     };
 
@@ -116,7 +116,13 @@ const ViewProfile = () => {
             Toast.error(msg);
         }
     };
-
+    if (loading) {
+        return (
+            <SafeAreaView className='flex-1 items-center justify-center'>
+                <ActivityIndicator size="large" />
+            </SafeAreaView>
+        )
+    }
     return (
         <SafeAreaView>
             <ScrollView showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false}>

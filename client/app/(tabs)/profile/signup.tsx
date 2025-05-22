@@ -8,6 +8,10 @@ import NuLink from '@/src/components/NuLink';
 import COLORS from '@/src/constants/colors';
 import { Toast } from 'toastify-react-native';
 import { useRouter } from 'expo-router';
+import { errorMessages, successMessages } from '@/src/constants/messages';
+import { AxiosError } from 'axios';
+import { ApiErrorProps } from '@/src/types/api-error';
+import InfoModal from '@/src/components/modal/InfoModal';
 
 type FormData = {
   fullName: string;
@@ -37,19 +41,27 @@ const Signup = () => {
   });
   const formValues = watch();
 
-const onSubmit = async (data: FormData) => {
-  setIsSubmitProcessing(true);
-  Toast.info("Information is being checked...");
-  try {
-    await signupCall(data.fullName, data.username, data.email, data.password);
-    router.replace("/(tabs)/profile/login");
-  } catch (error: any) {
-    // console.error("Signup error:", error);
-  } finally {
-    setIsSubmitProcessing(false);
-  }
-};
+  const [showTerms, setShowTerms] = useState(false);
 
+  const onSubmit = async (data: FormData) => {
+    setIsSubmitProcessing(true);
+    Toast.info("Checking information...");
+    try {
+      const message = await signupCall(
+        data.fullName,
+        data.username,
+        data.email,
+        data.password
+      );
+      Toast.success(message || successMessages.signup);
+      router.replace("/(tabs)/profile/login");
+    } catch (err: unknown) {
+      const axiosError = err as AxiosError<ApiErrorProps>;
+      Toast.error(axiosError.response?.data?.message || errorMessages.signup);
+    } finally {
+      setIsSubmitProcessing(false);
+    }
+  };
 
   const textInputClasses = 'font-nunitoBold text-2xl bg-greayish rounded-2xl h-16 px-6';
   return (
@@ -180,7 +192,7 @@ const onSubmit = async (data: FormData) => {
               </View>
               <View className='flex-row gap-x-1'>
                 <NuText variant='semiBold' className='text-xl'>I agree</NuText>
-                <TouchableOpacity onPress={() => console.log('terms and conditions')}>
+                <TouchableOpacity onPress={() => setShowTerms(true)}>
                   <NuText variant='semiBold' className='text-primary text-xl'>terms & conditions</NuText>
                 </TouchableOpacity>
               </View>
@@ -200,6 +212,13 @@ const onSubmit = async (data: FormData) => {
         <NuText variant='regular' className='text-lg'>Already have an account?</NuText>
         <NuLink href='/(tabs)/profile/login' variant='medium' className='text-primary text-xl'>Login</NuLink>
       </View>
+      <InfoModal
+        visible={showTerms}
+        onClose={() => setShowTerms(false)}
+        title="Terms & Conditions"
+        description="By signing up, you agree to our Terms & Conditions. This platform is a public event-sharing system. Event organizers are solely responsible for the events they create. The platform owners do not take any responsibility for the content, safety, or outcomes of any events."
+        buttonText="Got it!"
+      />
     </View>
   );
 }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Message, MessageCount } from "@/src/types/message";
+import { Message, MessageCount, MessageCountsMap } from "@/src/types/message";
 import useAxios from "./common/useAxios";
 
 export function useMessage() {
@@ -17,14 +17,15 @@ export function useMessage() {
         }
     };
 
-    const getMessageCountsByEventIds = async (eventIds: string[]) => {
+    const getMessageCountsByEventIds = async (eventIds: string[]): Promise<MessageCountsMap> => {
         try {
             const { data } = await axiosInstance.post("/message/counts", { eventIds });
-            const map = Object.fromEntries(data.data.map((m: MessageCount) => [m.eventId, m.count]));
+            const map = Object.fromEntries(
+                data.data.map((m: MessageCount) => [m.eventId, m.count])
+            );
             return map;
         } catch (err) {
-            // console.error("Message count fetch error", err);
-            return [];
+            return {};
         }
     };
 

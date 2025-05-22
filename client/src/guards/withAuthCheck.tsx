@@ -1,11 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import { Text } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { useAppDispatch, useAppSelector } from "@/src/hooks/common/useRedux";
 import { setAccessToken, clearAccessToken } from "@/src/redux/features/authSlice";
 import { jwtDecode } from "jwt-decode";
 import useAxios from "@/src/hooks/common/useAxios";
 import { Redirect } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface WithAuthCheckProps {
   children?: React.ReactNode;
@@ -60,7 +61,12 @@ const withAuthCheck = <P extends WithAuthCheckProps>(
       checkTokenValidity();
     }, [auth.accessToken]);
 
-    if (isLoading) return <Text>Loading...</Text>
+    if (isLoading)
+      return (
+        <SafeAreaView className='flex-1 items-center justify-center'>
+          <ActivityIndicator size="large" />
+        </SafeAreaView>
+      )
     if (isAuthenticated === shouldRedirectAuthenticated)
       return <Redirect href={redirectPath} />;
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { TouchableOpacity, View, TextInput } from 'react-native';
+import { TouchableOpacity, View, TextInput, ActivityIndicator } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
@@ -21,6 +21,8 @@ import { StatusBar } from 'expo-status-bar';
 
 const Friends = () => {
     const decodedToken = useDecodedToken();
+    const [isLoading, setIsLoading] = useState(true);
+
     const { searchUsers } = useUser();
     const [userResults, setUserResults] = useState<UserSearch[]>([]);
     const [search, setSearch] = useState<string | null>(null);
@@ -44,6 +46,7 @@ const Friends = () => {
     const [sentRequests, setSentRequests] = useState<SentFriendRequestWithUser[]>([]);
 
     const fetchData = async () => {
+        setIsLoading(true);
         await cleanUpAcceptedRequests();
         const [friends, incomingRequests, sentRequests] = await Promise.all([
             getFriendsOfUser(decodedToken.userId),
@@ -53,7 +56,7 @@ const Friends = () => {
         setFriends(friends);
         setIncomingRequests(incomingRequests);
         setSentRequests(sentRequests);
-        console.log('sentRequests', sentRequests);
+        setIsLoading(false);
     };
 
     useFocusEffect(
@@ -107,6 +110,13 @@ const Friends = () => {
         fetchData();
     };
 
+    if (isLoading) {
+        return (
+            <SafeAreaView className='flex-1 items-center justify-center'>
+                <ActivityIndicator size="large" />
+            </SafeAreaView>
+        );
+    }
     return (
         <SafeAreaView edges={['top']} className="flex-1 pt-14">
             <StatusBar style="light" />

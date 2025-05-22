@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link, router, Stack, useLocalSearchParams } from 'expo-router';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Sharing from 'expo-sharing';
 import { BackIcon, DateDetailBackground, FavIcon, LineIcon, LocationDetailIcon, ParticipantsIcon, ShareIcon, TimerIcon, WarningIcon } from '@/src/components/Vectors';
@@ -31,10 +31,10 @@ const EventDetail = () => {
     const [onProgress, setOnProgress] = useState(false);
     const { isFavorited, onProgress: favoriteOnProgress, handleFavorite } = useEventFavorite(eventId);
 
-    const { getEventById } = useEvent();
+    const { getEventById, attendEvent, leaveEvent } = useEvent();
     const [event, setEvent] = useState<Event | null>(null);
     const { title, description, quota, type, location, date, isLimitedTime, isOnline, isPrivate, isFree, cover, participants, creator, createdAt, updatedAt } = event || {};
-    const [loading, setLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
 
     const dateParts = formatDate(new Date(date ?? "")).split(" ");
     const remainingSlots = Number(quota) - (participants?.length ?? 0);
@@ -45,10 +45,10 @@ const EventDetail = () => {
     const editEventLink = `/event/edit-event/${id}` as const;
 
     const fetchData = async () => {
-        setLoading(true);
+        setIsLoading(true);
         const result = await getEventById(eventId)
         setEvent(result);
-        setLoading(false);
+        setIsLoading(false);
     };
     useFocusEffect(
         useCallback(() => {
@@ -58,42 +58,24 @@ const EventDetail = () => {
     );
 
     const handleAttend = async () => {
-        if (!id) return;
+        if (!eventId) return;
         if (!decodedToken.userId) {
             Toast.error("You need to be logged in to attend an event.");
             router.push('/(tabs)/profile/login');
             return;
         }
-        try {
-            setOnProgress(true);
-            Toast.info("Joining event...");
-            const { data: responseData } = await axiosInstance.post(`/event/${id}/attend`);
-            Toast.success(responseData.message || successMessages.attended);
-        } catch (err: unknown) {
-            const message = err instanceof Error ? err.message : errorMessages.attended;
-            Toast.error(message);
-        }
-        finally {
-            setOnProgress(false);
-            fetchData();
-        }
+        setOnProgress(true);
+        await attendEvent(eventId);
+        setOnProgress(false);
+        fetchData();
     };
 
     const handleLeave = async () => {
-        if (!id) return;
-        try {
-            setOnProgress(true);
-            Toast.info("Leaving event...");
-            const { data: responseData } = await axiosInstance.post(`/event/${id}/leave`);
-            Toast.success(responseData.message || successMessages.unAttended);
-        } catch (err: unknown) {
-            const message = err instanceof Error ? err.message : errorMessages.unAttended;
-            Toast.error(message);
-        }
-        finally {
-            setOnProgress(false);
-            fetchData();
-        }
+        if (!eventId) return;
+        setOnProgress(true);
+        await leaveEvent(eventId);
+        setOnProgress(false);
+        fetchData();
     };
 
     const handleShare = async () => {
@@ -144,7 +126,7 @@ const EventDetail = () => {
                     <View className='absolute bottom-0 items-center'>
                         <DateDetailBackground width={316} height={54} />
                         {
-                            !loading &&
+                            !isLoading &&
                             <View className='absolute bottom-1.5 flex-row items-center gap-x-0.5'>
                                 <NuText variant='bold' className='text-whitish text-3xl'>{dateParts[0]}</NuText>
                                 <NuText variant='semiBold' className='text-whitish text-2xl mx-1'>{dateParts[1]}</NuText>
@@ -245,7 +227,8 @@ const EventDetail = () => {
                 </View>
             </ScrollView>
             {
-                isUserEventOwner && (
+                !isLoading &&
+                    isUserEventOwner ? (
                     <View className='fixed bottom-0'>
                         <TouchableOpacity onPress={() => router.push(editEventLink)} className='bg-secondary h-16 items-center justify-center rounded-t-3xl'>
                             <NuText variant='extraBold' className='text-2xl text-white'>EDIT EVENT</NuText>
@@ -253,11 +236,8 @@ const EventDetail = () => {
                         <TouchableOpacity onPress={() => router.push(`/attenders/${id}`)} className='bg-primary h-20 items-center justify-center pb-2'>
                             <NuText variant='extraBold' className='text-2xl text-white'>VIEW ATTENDEES</NuText>
                         </TouchableOpacity>
-                    </View>
-                )
-            }
-            {
-                !isUserEventOwner && (
+                    </View>)
+                    :
                     isUserParticipant ?
                         <TouchableOpacity onPress={handleLeave} disabled={onProgress} className='fixed bottom-0 bg-quaternary h-20 items-center justify-center pb-2 rounded-[14px]'>
                             <NuText variant='extraBold' className='text-2xl text-white'>{!onProgress ? 'LEAVE' : 'LEAVING...'}</NuText>
@@ -266,7 +246,6 @@ const EventDetail = () => {
                         <TouchableOpacity onPress={handleAttend} disabled={onProgress} className='fixed bottom-0 bg-primary h-20 items-center justify-center pb-2 rounded-[14px]'>
                             <NuText variant='extraBold' className='text-2xl text-white'>{!onProgress ? 'ATTEND NOW' : 'ATTENDING...'}</NuText>
                         </TouchableOpacity>
-                )
             }
         </View>
     );

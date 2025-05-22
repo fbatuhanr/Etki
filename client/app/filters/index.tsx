@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
-import { View, TouchableOpacity, TextInput } from 'react-native';
+import { View, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
 import { FlatList, ScrollView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import { Stack } from 'expo-router';
@@ -28,7 +28,7 @@ const FiltersLayout = () => {
     const { eventTypes, getEventTypes } = useEventTypes();
 
     const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const safeQuery = Array.isArray(query) ? query[0] : query ?? '';
     const [queryString, setQueryString] = useState(safeQuery);
@@ -100,7 +100,7 @@ const FiltersLayout = () => {
 
         const fetchFilteredEvents = async () => {
             try {
-                setLoading(true);
+                setIsLoading(true);
                 const { data: responseData } = await axiosInstance.get("/event/filter", {
                     params: {
                         filters: encodeURIComponent(JSON.stringify(filters)),
@@ -112,7 +112,7 @@ const FiltersLayout = () => {
                 console.error("Filter error", error);
             }
             finally {
-                setLoading(false);
+                setIsLoading(false);
             }
         };
 
@@ -238,7 +238,7 @@ const FiltersLayout = () => {
             />
             <View className='min-h-screen'>
                 {
-                    !loading ?
+                    !isLoading ?
                         filteredEvents.length ? (
                             <FlatList
                                 data={filteredEvents}
@@ -257,7 +257,7 @@ const FiltersLayout = () => {
                         )
                         :
                         <View className="h-full w-full items-center justify-center">
-                            <NuText variant='regular' className='text-2xl text-neutral-500'>Loading...</NuText>
+                            <ActivityIndicator size="large" />
                         </View>
                 }
             </View>

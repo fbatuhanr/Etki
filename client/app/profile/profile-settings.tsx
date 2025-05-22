@@ -21,6 +21,7 @@ import { deleteFromFirebase, uploadImageToFirebase } from '@/src/lib/firebaseOpe
 import { Image } from 'expo-image';
 import { imageBlurHash } from '@/src/constants/images';
 import { User } from '@/src/types/user';
+import InfoModal from '@/src/components/modal/InfoModal';
 
 type FormData = {
     name: string;
@@ -51,6 +52,8 @@ const ProfileSettings = () => {
         }
     });
     const formValues = watch();
+    
+    const [showInfo, setShowInfo] = useState(false);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -260,7 +263,7 @@ const ProfileSettings = () => {
                                     </View>
                                     <View className='flex-row gap-x-2 items-center'>
                                         <NuText variant='semiBold' className='text-xl'>Public Account</NuText>
-                                        <TouchableOpacity onPress={() => console.log('Public Account')} className='w-6 h-6 border-2 border-primary justify-center items-center rounded-full'>
+                                        <TouchableOpacity onPress={() => setShowInfo(true)} className='w-6 h-6 border-2 border-primary justify-center items-center rounded-full'>
                                             <Entypo name="info" size={13} color={COLORS.primary} />
                                         </TouchableOpacity>
                                     </View>
@@ -276,6 +279,13 @@ const ProfileSettings = () => {
                 className='h-24 bg-primary rounded-xl items-center justify-center'>
                 <NuText variant='bold' className='text-white text-3xl'>Save Changes</NuText>
             </TouchableOpacity>
+            <InfoModal
+                visible={showInfo}
+                onClose={() => setShowInfo(false)}
+                title="Public / Private Account"
+                description="Everyone can see your event history. If you want to hide your event history, you can set your account to private. In this case, only your followers can see your event history."
+                buttonText="Got it!"
+            />
         </SafeAreaView>
     );
 }

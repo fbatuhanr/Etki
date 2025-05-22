@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import NuText from '@/src/components/NuText';
 import NuLink from '@/src/components/NuLink';
 import EventType from '@/src/components/event/EventType';
@@ -19,7 +19,7 @@ const EventTypes = () => {
   if (eventTypesLoading)
     return (
       <View className='h-[512px] mr-6 items-center justify-center'>
-        <NuText variant='regular' className='text-2xl text-neutral-500'>Loading...</NuText>
+        <ActivityIndicator size="large" />
       </View>
     );
 
