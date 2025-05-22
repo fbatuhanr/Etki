@@ -40,15 +40,14 @@ const Attend = () => {
       setIsLoading(false);
     }
   };
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     fetchData();
-  //   }, [])
-  // );
-
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [])
+  );
+  // useEffect(() => {
+  //   fetchData();
+  // }, []);
 
   if (isLoading)
     return (

@@ -26,7 +26,6 @@ const EventCardWide: React.FC<Event> = ({
     cover,
     participants
 }) => {
-    console.log('participants', participants);
     const { isFavorited, onProgress, handleFavorite } = useEventFavorite(_id);
     const dateParts = formatDate(new Date(date ?? "")).split(" ");
     const remainingSlots = Number(quota) - (participants?.length ?? 0);

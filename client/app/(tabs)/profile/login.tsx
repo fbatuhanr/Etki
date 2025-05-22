@@ -9,7 +9,6 @@ import { Toast } from 'toastify-react-native';
 import useAuthentication from '@/src/hooks/common/useAuthentication';
 import { router } from 'expo-router';
 import { errorMessages, successMessages } from '@/src/constants/messages';
-import { isApiError } from '@/src/helpers/apiHelpers';
 import { AxiosError } from 'axios';
 import { ApiErrorProps } from '@/src/types/api-error';
 
@@ -36,7 +35,7 @@ const Login = () => {
     try {
       const message = await loginCall(data.username, data.password);
       Toast.success(message || successMessages.login);
-      router.replace("/(tabs)/profile");
+      router.replace("/");
     } catch (err: unknown) {
       const axiosError = err as AxiosError<ApiErrorProps>;
       Toast.error(axiosError.response?.data?.message || errorMessages.login);
