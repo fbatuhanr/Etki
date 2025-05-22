@@ -64,7 +64,7 @@ const ViewAttenders = () => {
                                     <Image
                                         source={creator?.photo || defaultUserCover}
                                         contentFit="cover"
-                                        transition={500}
+                                        transition={250}
                                         placeholder={{ blurhash: imageBlurHash }}
                                         style={{ width: '100%', height: '100%' }}
                                     />
@@ -94,7 +94,7 @@ const ViewAttenders = () => {
                                             <Image
                                                 source={attender.photo || defaultUserCover}
                                                 contentFit="cover"
-                                                transition={500}
+                                                transition={250}
                                                 placeholder={{ blurhash: imageBlurHash }}
                                                 style={{ width: '100%', height: '100%' }}
                                             />

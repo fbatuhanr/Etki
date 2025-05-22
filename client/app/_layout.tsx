@@ -32,7 +32,7 @@ export default function RootLayout() {
   }
   return (
     <StoreProvider>
-      <ToastManager duration={2000} />
+      <ToastManager duration={1500} />
       <GestureHandlerRootView style={{ flex: 1 }}>
         <StatusBar style="dark" />
         <Stack>
@@ -41,7 +41,10 @@ export default function RootLayout() {
             options={{
               headerTransparent: true,
               header: ({ navigation }) => (
-                <LinearGradient colors={['rgba(0, 0, 0, 0.9)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0)']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
+                <LinearGradient
+                  colors={['rgba(0, 0, 0, 0.9)', 'rgba(0, 0, 0, 0.6)', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0)']}
+                  style={{ height: 100 }}
+                >
                   <SafeAreaView className='flex-row ps-6 pe-8 justify-between'>
                     <TouchableOpacity onPress={() => navigation.goBack()} className='flex-row items-center gap-x-4'>
                       <BackIcon width={24} height={24} />
@@ -56,7 +59,10 @@ export default function RootLayout() {
             options={{
               headerTransparent: true,
               header: ({ navigation }) => (
-                <LinearGradient colors={['rgba(0, 0, 0, 0.9)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0)']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
+                <LinearGradient
+                  colors={['rgba(0, 0, 0, 0.9)', 'rgba(0, 0, 0, 0.6)', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0)']}
+                  style={{ height: 100 }}
+                >
                   <SafeAreaView className='flex-row ps-6 pe-8 justify-between'>
                     <TouchableOpacity onPress={() => navigation.goBack()} className='flex-row items-center gap-x-4'>
                       <BackIcon width={24} height={24} />
@@ -71,7 +77,10 @@ export default function RootLayout() {
             options={{
               headerTransparent: true,
               header: ({ navigation }) => (
-                <LinearGradient colors={['rgba(0, 0, 0, 0.9)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0)']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
+                <LinearGradient
+                  colors={['rgba(0, 0, 0, 0.9)', 'rgba(0, 0, 0, 0.6)', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0)']}
+                  style={{ height: 100 }}
+                >
                   <SafeAreaView className='flex-row ps-6 pe-8 justify-between'>
                     <TouchableOpacity onPress={() => navigation.goBack()} className='flex-row items-center gap-x-4'>
                       <BackIcon width={24} height={24} />
@@ -86,7 +95,10 @@ export default function RootLayout() {
             options={{
               headerTransparent: true,
               header: ({ navigation }) => (
-                <LinearGradient colors={['rgba(0, 0, 0, 0.9)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0)']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
+                <LinearGradient
+                  colors={['rgba(0, 0, 0, 0.9)', 'rgba(0, 0, 0, 0.6)', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0)']}
+                  style={{ height: 100 }}
+                >
                   <SafeAreaView className='flex-row ps-6 pe-8 justify-between'>
                     <TouchableOpacity onPress={() => navigation.goBack()} className='flex-row items-center gap-x-4'>
                       <BackIcon width={24} height={24} />
@@ -101,7 +113,10 @@ export default function RootLayout() {
             options={{
               headerTransparent: true,
               header: ({ navigation }) => (
-                <LinearGradient colors={['rgba(0, 0, 0, 0.9)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0)']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
+                <LinearGradient
+                  colors={['rgba(0, 0, 0, 0.9)', 'rgba(0, 0, 0, 0.6)', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0)']}
+                  style={{ height: 100 }}
+                >
                   <SafeAreaView className='flex-row ps-6 pe-8 justify-between'>
                     <TouchableOpacity onPress={() => navigation.goBack()} className='flex-row items-center gap-x-4'>
                       <BackIcon width={24} height={24} />

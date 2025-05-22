@@ -278,9 +278,9 @@ const ManageEvent: React.FC<ManageEventProps> = ({ id }) => {
                                 <TextInput
                                     cursorColor={COLORS.white}
                                     selectionColor={COLORS.white}
-                                    placeholderTextColor={COLORS.whietish}
+                                    placeholderTextColor="#d4d4d4"
                                     className={cn(
-                                        'h-[50px] bg-primary text-white text-xl rounded-xl px-4 pt-2 leading-none',
+                                        'h-[50px] bg-primary text-white text-xl rounded-xl px-4 leading-normal font-nunitoMedium',
                                         value ? 'font-semibold not-italic' : 'italic'
                                     )}
                                     placeholder="Amazing Event"
@@ -585,7 +585,7 @@ const ManageEvent: React.FC<ManageEventProps> = ({ id }) => {
                                         <Image
                                             source={cover}
                                             contentFit="cover"
-                                            transition={500}
+                                            transition={250}
                                             placeholder={{ blurhash: imageBlurHash }}
                                             style={{ width: "100%", height: "100%" }}
                                         />

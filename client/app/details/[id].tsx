@@ -21,6 +21,7 @@ import { errorMessages, successMessages } from '@/src/constants/messages';
 import { Toast } from 'toastify-react-native';
 import { useEventFavorite } from '@/src/hooks/event/useEventFavorite';
 import { set } from 'react-hook-form';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 const EventDetail = () => {
     const { id } = useLocalSearchParams();
@@ -33,7 +34,7 @@ const EventDetail = () => {
 
     const { getEventById, attendEvent, leaveEvent } = useEvent();
     const [event, setEvent] = useState<Event | null>(null);
-    const { title, description, quota, type, location, date, isLimitedTime, isOnline, isPrivate, isFree, cover, participants, creator, createdAt, updatedAt } = event || {};
+    const { title, description, quota, type, location, date, isLimitedTime, isOnline, isPrivate, isFree, entranceFee, cover, participants, creator, createdAt, updatedAt } = event || {};
     const [isLoading, setIsLoading] = useState(true);
 
     const dateParts = formatDate(new Date(date ?? "")).split(" ");
@@ -96,7 +97,10 @@ const EventDetail = () => {
                     options={{
                         headerTransparent: true,
                         header: ({ navigation }) => (
-                            <LinearGradient colors={['rgba(0, 0, 0, 1)', 'rgba(0, 0, 0, 0)']} className='flex-1' start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}>
+                            <LinearGradient
+                                colors={['rgba(0, 0, 0, 0.9)', 'rgba(0, 0, 0, 0.6)', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0)']}
+                                style={{ height: 100 }}
+                            >
                                 <SafeAreaView className='flex-row ps-6 pe-8 justify-between'>
                                     <TouchableOpacity onPress={() => navigation.goBack()} className='flex-row items-center gap-x-4'>
                                         <BackIcon width={24} height={24} />
@@ -119,7 +123,7 @@ const EventDetail = () => {
                     <Image
                         source={cover}
                         contentFit="cover"
-                        transition={500}
+                        transition={250}
                         placeholder={{ blurhash: imageBlurHash }}
                         style={{ width: "100%", height: "100%" }}
                     />
@@ -143,6 +147,12 @@ const EventDetail = () => {
                     <View className='bg-greeyish p-4 rounded-lg'>
                         <NuText className='text-base mb-2'>{description}</NuText>
                     </View>
+                    {
+                        (!isFree && entranceFee) &&
+                        <View className='bg-neutral-300 my-2 p-2 rounded-lg'>
+                            <NuText variant='bold' className='text-lg text-center'>Entrance Free: {entranceFee}</NuText>
+                        </View>
+                    }
                     <View className='ms-4 mt-4 gap-y-2.5'>
                         <View className='flex-row items-center gap-x-4'>
                             <View className='h-10 w-10 bg-primary rounded-full items-center justify-center'>
@@ -239,9 +249,15 @@ const EventDetail = () => {
                     </View>)
                     :
                     isUserParticipant ?
-                        <TouchableOpacity onPress={handleLeave} disabled={onProgress} className='fixed bottom-0 bg-quaternary h-20 items-center justify-center pb-2 rounded-[14px]'>
-                            <NuText variant='extraBold' className='text-2xl text-white'>{!onProgress ? 'LEAVE' : 'LEAVING...'}</NuText>
-                        </TouchableOpacity>
+                        <View className='fixed bottom-0'>
+                            <TouchableOpacity onPress={() => router.push(`/message-center/${eventId}?fromDetailPage=1`)} className='bg-primary h-16 items-center justify-center rounded-t-3xl flex-row gap-x-2'>
+                                <NuText variant='extraBold' className='text-2xl text-white'>EVENT CHAT</NuText>
+                                <AntDesign name="wechat" size={24} color="white" />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={handleLeave} disabled={onProgress} className='bg-quaternary h-20 items-center justify-center pb-2'>
+                                <NuText variant='extraBold' className='text-2xl text-white'>{!onProgress ? 'LEAVE' : 'LEAVING...'}</NuText>
+                            </TouchableOpacity>
+                        </View>
                         :
                         <TouchableOpacity onPress={handleAttend} disabled={onProgress} className='fixed bottom-0 bg-primary h-20 items-center justify-center pb-2 rounded-[14px]'>
                             <NuText variant='extraBold' className='text-2xl text-white'>{!onProgress ? 'ATTEND NOW' : 'ATTENDING...'}</NuText>

@@ -152,7 +152,7 @@ const Friends = () => {
                                             <Image
                                                 source={user.photo || defaultUserCover}
                                                 contentFit="cover"
-                                                transition={500}
+                                                transition={250}
                                                 placeholder={{ blurhash: imageBlurHash }}
                                                 style={{ width: '100%', height: '100%' }}
                                             />
@@ -196,7 +196,7 @@ const Friends = () => {
                                             <Image
                                                 source={req.to.photo || defaultUserCover}
                                                 contentFit="cover"
-                                                transition={500}
+                                                transition={250}
                                                 placeholder={{ blurhash: imageBlurHash }}
                                                 style={{ width: '100%', height: '100%' }}
                                             />
@@ -241,7 +241,7 @@ const Friends = () => {
                                             <Image
                                                 source={req.from.photo || defaultUserCover}
                                                 contentFit="cover"
-                                                transition={500}
+                                                transition={250}
                                                 placeholder={{ blurhash: imageBlurHash }}
                                                 style={{ width: '100%', height: '100%' }}
                                             />
@@ -276,13 +276,13 @@ const Friends = () => {
                 </View>
 
                 <View className="mt-8">
-                    <NuText variant="bold" className="text-3xl mb-2 border-b border-neutral-200 pb-1">Friends List ({friends.length})</NuText>
+                    <NuText variant="bold" className="text-3xl mb-2 border-b border-neutral-200 pb-1">Friend List ({friends.length})</NuText>
                     {friends.length > 0 ? (
                         friends.map((friend) => (
                             <Animated.View
                                 key={friend._id}
                                 entering={FadeInUp.delay(50)}
-                                className="w-full h-24 bg-primary rounded p-4 flex flex-row justify-between items-center shadow"
+                                className="w-full h-24 bg-primary rounded mt-2 p-4 flex flex-row justify-between items-center shadow"
                             >
                                 <View className="flex-row items-center gap-x-4">
                                     <Link href={`/profile/${friend._id}`}>
@@ -290,7 +290,7 @@ const Friends = () => {
                                             <Image
                                                 source={friend.photo || defaultUserCover}
                                                 contentFit="cover"
-                                                transition={500}
+                                                transition={250}
                                                 placeholder={{ blurhash: imageBlurHash }}
                                                 style={{ width: '100%', height: '100%' }}
                                             />

@@ -133,7 +133,7 @@ const ViewProfile = () => {
                                 <Image
                                     source={user?.photo || defaultUserCover}
                                     contentFit="cover"
-                                    transition={500}
+                                    transition={250}
                                     placeholder={{ blurhash: imageBlurHash }}
                                     style={{ width: "100%", height: "100%" }}
                                 />

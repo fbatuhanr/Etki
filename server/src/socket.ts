@@ -17,20 +17,17 @@ export const initializeSocket = (server: HttpServer) => {
   io.on("connection", (socket: Socket) => {
     console.log("Socket connected:", socket.id);
 
-    // 🔐 Kullanıcı register oluyor (kendi ID’siyle odasına giriyor)
     socket.on("register", (userId: string) => {
       socketUsers.add(userId);
       socket.join(userId);
       console.log(`User ${userId} registered`);
     });
 
-    // ✅ Etkinlik odasına katılma
     socket.on("joinEventRoom", (eventId: string) => {
       socket.join(eventId);
       console.log(`Socket ${socket.id} joined event room ${eventId}`);
     });
 
-    // ✉️ Mesaj gönderme
     socket.on("sendMessage", async (data: {
       eventId: string;
       senderId: string;
@@ -49,14 +46,12 @@ export const initializeSocket = (server: HttpServer) => {
 
         const populatedMessage = await message.populate("sender", "username name surname photo");
 
-        // 🔄 Odaya mesajı yayınla
         io.to(eventId).emit("newMessage", populatedMessage);
       } catch (error) {
         console.error("Message save/send error:", error);
       }
     });
 
-    // ❌ Bağlantı kesildiğinde kullanıcıyı kaldır
     socket.on("disconnect", () => {
       console.log("Socket disconnected:", socket.id);
       socketUsers.forEach((userId) => {

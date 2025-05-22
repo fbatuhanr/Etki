@@ -51,17 +51,37 @@ export async function deleteEvent(id: string) {
   return Event.findByIdAndDelete(id);
 }
 export async function attendEvent(eventId: string, userId: string) {
-  const event = await Event.findById(eventId);
+  const event = await Event.findById(eventId).populate("createdBy");
   if (!event) {
     throw new Error("Event not found.");
   }
+
+  if (event.isPrivate) {
+    const user = await User.findById(userId).select("friends");
+    const isFriend = user?.friends.some((friendId) => friendId.toString() === event?.createdBy!.toString());
+    const isOwner = event.createdBy!.toString() === userId;
+
+    if (!isFriend && !isOwner) {
+      throw new Error("This event is private. You need to be friends with the creator to join.");
+    }
+  }
+
+  if (
+    event.quota !== undefined &&
+    !isNaN(Number(event.quota)) &&
+    event.participants.length >= Number(event.quota)
+  ) {
+    throw new Error("Event is full.");
+  }
+
   const alreadyJoined = event.participants.some((p) => p.toString() === userId);
   if (alreadyJoined) {
     throw new Error("You have already joined this event.");
   }
+
   event.participants.push(new Types.ObjectId(userId));
   await event.save();
-};
+}
 export async function leaveEvent(eventId: string, userId: string) {
   const event = await Event.findById(eventId);
   if (!event) {

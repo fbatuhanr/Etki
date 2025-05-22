@@ -46,7 +46,7 @@ const MessageCenter = () => {
     );
   }
   return (
-    <SafeAreaView edges={['top']} className="flex-1">
+    <SafeAreaView className="flex-1">
       <View className="pt-16 px-4">
         <NuText variant="bold" className="text-3xl mb-4">Message Center</NuText>
         <FlatList

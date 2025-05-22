@@ -36,7 +36,7 @@ const EventCardWide: React.FC<Event> = ({
                 <Image
                     source={cover}
                     contentFit="cover"
-                    transition={500}
+                    transition={250}
                     placeholder={{ blurhash: imageBlurHash }}
                     style={{ width: "100%", height: "100%" }}
                 />
@@ -127,7 +127,7 @@ const EventCardWide: React.FC<Event> = ({
                                     <Image
                                         source={participant?.photo || defaultUserCover}
                                         contentFit="cover"
-                                        transition={500}
+                                        transition={250}
                                         placeholder={{ blurhash: imageBlurHash }}
                                         style={{ width: "100%", height: "100%" }}
                                     />

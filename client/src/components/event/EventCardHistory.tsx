@@ -23,7 +23,7 @@ const EventCardHistory: React.FC<IEventCardHistory> = ({ _id, title, cover, date
             <Image
                 source={cover}
                 contentFit="cover"
-                transition={500}
+                transition={250}
                 placeholder={{ blurhash: imageBlurHash }}
                 style={{ width: "100%", height: "100%" }}
             />
