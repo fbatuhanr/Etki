@@ -1,4 +1,4 @@
-import { SelectionType } from "../components/modal/CalendarModal";
+import { SelectionType } from "@/src/components/modal/CalendarModal";
 
 export const dateFormatter = (date?: Date): string => date?.toLocaleDateString() || '';
 

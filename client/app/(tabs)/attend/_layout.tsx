@@ -7,8 +7,6 @@ import { Link, router, Slot } from 'expo-router';
 import NuText from '@/src/components/NuText';
 import { LogoMultipleRing, SearchIcon, CalendarIcon, BackIcon } from '@/src/components/Vectors';
 
-// import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
-
 import { COLORS } from '@/src/constants/colors';
 import CalendarModal from '@/src/components/modal/CalendarModal';
 

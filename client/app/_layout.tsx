@@ -13,7 +13,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BackIcon } from '@/src/components/Vectors';
 import NuText from '@/src/components/NuText';
 import '../global.css';
-
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
