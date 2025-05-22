@@ -53,8 +53,9 @@ export const useEvent = () => {
     try {
       const { data: responseData } = await axiosInstance.get(`/event/favorites/${userId}`);
       return responseData.data;
-    } catch (err: any) {
-      throw new Error(err.message);
+    } catch (err: unknown) {
+      const axiosError = err as AxiosError<ApiErrorProps>;
+      throw new Error(axiosError.response?.data?.message || errorMessages.default)
     }
   };
 
@@ -96,7 +97,8 @@ export const useEvent = () => {
       const { data: responseData } = await axiosInstance.post(`/event/${eventId}/attend`);
       Toast.success(responseData.message || successMessages.attended);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : errorMessages.attended;
+      const axiosError = err as AxiosError<ApiErrorProps>;
+      const message = axiosError.response?.data?.message || errorMessages.attended;
       Toast.error(message);
     }
   }
@@ -107,7 +109,8 @@ export const useEvent = () => {
       const { data: responseData } = await axiosInstance.post(`/event/${eventId}/leave`);
       Toast.success(responseData.message || successMessages.unAttended);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : errorMessages.unAttended;
+      const axiosError = err as AxiosError<ApiErrorProps>;
+      const message = axiosError.response?.data?.message || errorMessages.unAttended;
       Toast.error(message);
     }
   }

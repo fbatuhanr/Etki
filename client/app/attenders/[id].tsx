@@ -80,7 +80,12 @@ const ViewAttenders = () => {
                     </Animated.View>
                 </View>
                 <View className="mt-8">
-                    <NuText variant="bold" className="text-3xl mb-2 border-b border-neutral-200 pb-1">Attendees {attenders.length + 1}/{Number(event?.quota)}</NuText>
+                    <NuText variant="bold" className="text-3xl mb-2 border-b border-neutral-200 pb-1">
+                        Attendees
+                        &nbsp;
+                        {attenders.length + 1}
+                        {Number(event?.quota) > 0 && '/' + Number(event?.quota)}
+                    </NuText>
                     {attenders.length > 0 ? (
                         attenders.map((attender) => (
                             <Animated.View

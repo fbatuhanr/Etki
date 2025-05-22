@@ -17,7 +17,7 @@ export function useEventFavorite(eventId?: string) {
     try {
       const { data } = await axiosInstance.get(`/event/${eventId}/is-favorited`);
       setIsFavorited(data.isFavorited);
-    } catch {};
+    } catch { };
   };
 
   useEffect(() => {
@@ -33,8 +33,8 @@ export function useEventFavorite(eventId?: string) {
       return;
     }
 
-    setOnProgress(true);
     try {
+      setOnProgress(true);
       if (isFavorited) {
         const { data } = await axiosInstance.delete(`/event/${eventId}/favorite`);
         Toast.success(data.message || successMessages.favoriteRemoved);

@@ -177,6 +177,7 @@ const ManageEvent: React.FC<ManageEventProps> = ({ id }) => {
 
             const response = await axiosInstance.post('event', payload);
             Toast.success(response.data.message || successMessages.default);
+            reset();
             router.push('/(tabs)/attend');
 
         } catch (err: unknown) {
@@ -392,11 +393,12 @@ const ManageEvent: React.FC<ManageEventProps> = ({ id }) => {
                     <View>
                         <View className='flex-row justify-between items-center px-2 mb-1'>
                             <NuText variant='bold' className='text-2xl'>Location</NuText>
-                            {errors.type && <NuText variant='medium' className='text-lg ml-2 text-red-500'>Required*</NuText>}
+                            {errors.location && <NuText variant='medium' className='text-lg ml-2 text-red-500'>Required*</NuText>}
                         </View>
                         <Controller
                             name="location"
                             control={control}
+                            rules={{ required: true }}
                             render={({ field: { onChange, onBlur, value } }) => (
                                 <TextInput
                                     cursorColor={COLORS.white}
@@ -422,9 +424,7 @@ const ManageEvent: React.FC<ManageEventProps> = ({ id }) => {
                         <Controller
                             name="date"
                             control={control}
-                            rules={{
-                                required: true,
-                            }}
+                            rules={{ required: true }}
                             render={({ field: { onChange, onBlur, value } }) => (
                                 <View>
                                     <TouchableOpacity onPress={() => setIsModalVisible({ ...isModalVisible, date: true })}>

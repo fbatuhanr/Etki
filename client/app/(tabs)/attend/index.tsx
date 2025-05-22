@@ -17,20 +17,21 @@ const Attend = () => {
 
   const { getAllEvents } = useEvent();
   const { eventTypes, getEventTypes } = useEventTypes();
-  const [events, setEvents] = useState<Event[]>([]);
+
+  const [featuredEvents, setFeaturedEvents] = useState<Event[]>([]);
+  const [newestEvents, setNewestEvents] = useState<Event[]>([]);
+  const [mostPopularEvents, setMostPopularEvents] = useState<Event[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
-
-  const featuredEvents = [...events].filter((e) => new Date(e.date).getTime() > Date.now()).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  const newestEvents = [...events].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  const mostPopularEvents = [...events].sort((a, b) => (b.participants?.length || 0) - (a.participants?.length || 0));
 
   const fetchData = async () => {
     try {
       setIsLoading(true);
       const [events] = await Promise.all([getAllEvents(), getEventTypes()]);
-      setEvents(events);
+      setFeaturedEvents([...events].filter((e) => new Date(e.date).getTime() > Date.now()).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
+      setNewestEvents([...events].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+      setMostPopularEvents([...events].sort((a, b) => (b.participants?.length || 0) - (a.participants?.length || 0)));
     } catch (err: unknown) {
       setIsError(true);
       const errorMessage = err instanceof Error ? err.message : errorMessages.default;

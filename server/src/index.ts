@@ -25,12 +25,14 @@ mongoose
 
 const app: Express = express();
 const port = process.env.PORT || 3001;
+/*
 const corsOptions = {
   origin: process.env.CORS_ORIGIN || "http://localhost:3001",
   credentials: true,
 };
-
 app.use(cors(corsOptions));
+*/
+app.use(cors());
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());

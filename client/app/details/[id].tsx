@@ -16,18 +16,14 @@ import { imageBlurHash } from '@/src/constants/images';
 import { Image } from 'expo-image';
 import { useFocusEffect } from '@react-navigation/native';
 import { useEvent } from '@/src/hooks/event/useEvent';
-import useAxios from '@/src/hooks/common/useAxios';
-import { errorMessages, successMessages } from '@/src/constants/messages';
 import { Toast } from 'toastify-react-native';
 import { useEventFavorite } from '@/src/hooks/event/useEventFavorite';
-import { set } from 'react-hook-form';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
 const EventDetail = () => {
     const { id } = useLocalSearchParams();
     const eventId = id as string;
     const decodedToken = useDecodedToken();
-    const axiosInstance = useAxios();
 
     const [onProgress, setOnProgress] = useState(false);
     const { isFavorited, onProgress: favoriteOnProgress, handleFavorite } = useEventFavorite(eventId);
@@ -107,7 +103,7 @@ const EventDetail = () => {
                                         <NuText variant='bold' className='text-2xl text-white'>Event Detail</NuText>
                                     </TouchableOpacity>
                                     <View className='flex-row gap-x-3'>
-                                        <TouchableOpacity onPress={handleFavorite} disabled={onProgress}>
+                                        <TouchableOpacity onPress={handleFavorite} disabled={favoriteOnProgress}>
                                             <FavIcon isFilled={isFavorited} isWhite height={26} width={26} viewBox='0 0 16 14' strokeWidth={1.25} />
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={handleShare}>
@@ -166,8 +162,13 @@ const EventDetail = () => {
                             </View>
                             <Link href={`/attenders/${id}`}>
                                 <View className='flex-row gap-x-2 items-center'>
-                                    <NuText variant='medium' className='text-lg text-primary border-b border-primary'>{quotaWithOwner} PEOPLE</NuText>
-                                    <NuText variant='medium' className='text-base text-secondary'>({remainingSlots} LEFT)</NuText>
+                                    {quotaWithOwner > 0
+                                        ?
+                                        <NuText variant='medium' className='text-lg text-primary border-b border-primary'>{quotaWithOwner} PEOPLE</NuText>
+                                        :
+                                        <NuText variant='medium' className='text-lg text-primary border-b border-primary'>NO QUOTA LIMIT</NuText>
+                                    }
+                                    {remainingSlots >= 0 && <NuText variant='medium' className='text-base text-secondary'>({remainingSlots} LEFT)</NuText>}
                                 </View>
                             </Link>
                         </View>
