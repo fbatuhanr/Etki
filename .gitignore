@@ -1,6 +1,9 @@
 # React Native (Expo) and Node.js .gitignore settings
 
 # CLIENT
+# ANDROID IOS
+ios/
+android/
 ## dependencies
 /client/node_modules/
 ## Expo
