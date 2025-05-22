@@ -17,7 +17,7 @@ import { auth } from "./features/auth";
 import errorHandler from "./middleware/errorHandler";
 
 /* CONFIGURATIONS */
-dotenv.config();
+dotenv.config();  
 mongoose
   .connect(process.env.MONGODB_URI!, { dbName: process.env.MONGODB_NAME })
   .then(() => console.log("Connected to the database"))
@@ -25,14 +25,8 @@ mongoose
 
 const app: Express = express();
 const port = process.env.PORT || 3001;
-/*const corsOptions = {
-  origin: process.env.CORS_ORIGIN || "http://localhost:3001",
-  credentials: true,
-};*/
-
-// app.use(cors(corsOptions));
 const corsOptions = {
-  origin: "http://localhost:8081", // veya Expo web client hangi porttaysa
+  origin: process.env.CORS_ORIGIN || "http://localhost:3001",
   credentials: true,
 };
 
